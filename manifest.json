@@ -1,0 +1,99 @@
+{
+  "display_information": {
+    "name": "AccessibilityAlly",
+    "description": "Makes any Slack thread legible to anyone — PMs in dev channels, new hires, screen-reader users, ESL readers.",
+    "long_description": "AccessibilityAlly is a Slack agent that lowers the cost of understanding. Pick a persona (PM, exec, new hire, plain-language) and Ally rewrites any thread for that audience — defining acronyms, surfacing decisions and owners, and producing screen-reader-friendly output. Powered by Slack AI, the Real-Time Search API (via the Slack MCP server), and MCP integrations with Notion and Jira for canonical context.",
+    "background_color": "#1f2937"
+  },
+  "features": {
+    "assistant_view": {
+      "assistant_description": "I make any Slack thread legible to anyone — pick a persona and I'll translate.",
+      "suggested_prompts": []
+    },
+    "app_home": {
+      "home_tab_enabled": true,
+      "messages_tab_enabled": true,
+      "messages_tab_read_only_enabled": false
+    },
+    "bot_user": {
+      "display_name": "ally",
+      "always_online": true
+    },
+    "shortcuts": [
+      {
+        "name": "Catch me up",
+        "type": "message",
+        "callback_id": "catch_me_up",
+        "description": "Summarize this thread for your persona (PM, exec, new hire, plain-language)."
+      }
+    ],
+    "slash_commands": [
+      {
+        "command": "/ally",
+        "description": "AccessibilityAlly commands: persona, plainify, help",
+        "usage_hint": "[persona pm|exec|new_hire|plain] | [plainify <text>] | [help]",
+        "should_escape": false
+      }
+    ]
+  },
+  "oauth_config": {
+    "redirect_urls": ["https://ngrok-free.app/slack/oauth_redirect"],
+    "scopes": {
+      "user": [
+        "search:read",
+        "channels:history",
+        "channels:read",
+        "groups:history",
+        "groups:read",
+        "im:history",
+        "mpim:history",
+        "users:read",
+        "search:read.public",
+        "search:read.private",
+        "search:read.mpim",
+        "search:read.im",
+        "search:read.files",
+        "search:read.users",
+        "chat:write",
+        "canvases:read",
+        "canvases:write",
+        "users:read.email"
+      ],
+      "bot": [
+        "app_mentions:read",
+        "channels:history",
+        "chat:write",
+        "commands",
+        "files:read",
+        "groups:history",
+        "im:history",
+        "im:read",
+        "im:write",
+        "reactions:read",
+        "reactions:write",
+        "users:read",
+        "assistant:write"
+      ]
+    }
+  },
+  "settings": {
+    "event_subscriptions": {
+      "request_url": "https://ngrok-free.app/slack/events",
+      "bot_events": [
+        "app_home_opened",
+        "app_mention",
+        "assistant_thread_started",
+        "file_shared",
+        "message.channels",
+        "message.groups",
+        "message.im"
+      ]
+    },
+    "interactivity": {
+      "is_enabled": true,
+      "request_url": "https://ngrok-free.app/slack/events"
+    },
+    "socket_mode_enabled": true,
+    "token_rotation_enabled": false
+  }
+}
