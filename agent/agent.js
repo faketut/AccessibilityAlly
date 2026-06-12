@@ -1,6 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 
 import { personaPromptFragment } from '../lib/personas.js';
+import { fetchJiraIssue, searchSlack } from './tools.js';
 
 const SYSTEM_PROMPT = `\
 You are AccessibilityAlly â€” a Slack agent that makes any conversation legible to anyone.
@@ -21,15 +22,18 @@ lower the cost of understanding without losing fidelity.
 - Honesty over confidence. If the thread is ambiguous, say what is unclear and who could clarify.
 
 ## TOOLS YOU MAY HAVE
-- **Slack MCP Server** (when user token is connected): search messages and files across the
-  workspace, read channel history and threads, read canvas documents. Use it to find backstory
-  ("when was X first mentioned?"), to look up acronym definitions used elsewhere, and to find
-  the right canonical message to link to.
-- **Notion MCP Server** (when configured): canonical project docs, runbooks, glossaries.
-- **Jira MCP Server** (when configured): ticket status, owners, links. If you see a key like
-  PROJ-123, look it up before paraphrasing.
+- **search_slack** (when a user token is configured): search messages and files across the
+  workspace as the invoking user. Use it to find backstory ("when was X first mentioned?"),
+  to look up acronym definitions used elsewhere, and to find canonical messages to cite.
+- **fetch_jira_issue** (when Jira credentials are configured): look up a Jira issue by key
+  and return summary, status, assignee, and canonical link.
 
 Use tools when they would change your answer. Do not narrate that you are using them.
+
+## TOOL EXECUTION RULES
+- If you see an acronym, codename, person reference, or ticket key that the thread does not define, call a tool before writing the glossary.
+- If text matches a Jira issue key pattern (example: PROJ-123), call the fetch_jira_issue tool before summarizing status, owner, or next step.
+- Do not guess external facts when a tool can verify them.
 
 ## OUTPUT TEMPLATE for "catch me up" tasks
 Use these sections, in this order, skipping any that are empty:
@@ -55,6 +59,57 @@ For free-form chat outside of "catch me up", just follow the principles above â€
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
+const TOOL_DECLARATIONS = [
+  {
+    name: 'search_slack',
+    description:
+      'Search Slack messages/files across the workspace. Use to find acronym definitions, project context, owners, or canonical messages to cite.',
+    parametersJsonSchema: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'Slack search query. Example: "auth_v2 in:#backend-platform"',
+        },
+        count: {
+          type: 'number',
+          description: 'Maximum number of results, between 1 and 10. Defaults to 5.',
+        },
+      },
+      required: ['query'],
+    },
+  },
+  {
+    name: 'fetch_jira_issue',
+    description: 'Look up a Jira issue by key and return summary, status, assignee, and canonical link.',
+    parametersJsonSchema: {
+      type: 'object',
+      properties: {
+        key: {
+          type: 'string',
+          description: 'Issue key like PROJ-123',
+        },
+      },
+      required: ['key'],
+    },
+  },
+];
+
+/**
+ * @param {{name: string, args?: Record<string, unknown>}} call
+ * @param {AgentDeps | undefined} deps
+ * @returns {Promise<Record<string, unknown>>}
+ */
+async function dispatchToolCall(call, deps) {
+  if (call.name === 'search_slack') {
+    return searchSlack(/** @type {{query?: string, count?: number}} */ (call.args || {}), deps);
+  }
+  if (call.name === 'fetch_jira_issue') {
+    return fetchJiraIssue(/** @type {{key?: string}} */ (call.args || {}));
+  }
+  return { error: `Unknown tool: ${call.name}` };
+}
+
 /**
  * Run the agent with the given text and optional session ID.
  * @param {string} text - The user's message text.
@@ -63,13 +118,48 @@ const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
  * @returns {Promise<{responseText: string, sessionId: string | null}>}
  */
 export async function runAgent(text, sessionId = undefined, deps = undefined) {
+  void sessionId;
   const systemInstruction = SYSTEM_PROMPT + personaPromptFragment(deps?.personaId);
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.0-flash',
-    contents: text,
-    config: { systemInstruction },
-  });
+  /** @type {Array<{ role: 'user' | 'model', parts: Array<Record<string, unknown>> }>} */
+  const contents = [{ role: 'user', parts: [{ text }] }];
 
-  return { responseText: response.text ?? '', sessionId: null };
+  for (let i = 0; i < 4; i += 1) {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents,
+      config: {
+        systemInstruction,
+        tools: [{ functionDeclarations: TOOL_DECLARATIONS }],
+      },
+    });
+
+    const calls = (response.functionCalls || []).filter((call) => !!call.name);
+    if (calls.length === 0) {
+      return { responseText: response.text ?? '', sessionId: null };
+    }
+
+    contents.push({ role: 'model', parts: calls.map((call) => ({ functionCall: call })) });
+
+    const toolResponses = await Promise.all(
+      calls.map(async (call) => ({
+        functionResponse: {
+          name: /** @type {string} */ (call.name),
+          response: await dispatchToolCall(
+            {
+              name: /** @type {string} */ (call.name),
+              args: /** @type {Record<string, unknown> | undefined} */ (call.args),
+            },
+            deps,
+          ),
+        },
+      })),
+    );
+    contents.push({ role: 'user', parts: toolResponses });
+  }
+
+  return {
+    responseText: 'I could not finish gathering context from tools in time. Please try again.',
+    sessionId: null,
+  };
 }

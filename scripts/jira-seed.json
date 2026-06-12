@@ -1,0 +1,30 @@
+[
+  {
+    "summary": "auth_v2: migrate session storage to Redis Cluster",
+    "description": "Move the auth_v2 session store from single-node Redis to a 3-shard Redis Cluster behind the new VPC endpoint. Owner: Ana Chen (staff eng, platform).",
+    "transition": "In Progress"
+  },
+  {
+    "summary": "auth_v2: deprecate /v1/login endpoint",
+    "description": "Send 410 Gone for /v1/login after the 2026-07-01 cutover. Mobile clients <4.8 must upgrade first. Owner: Priya Shah.",
+    "transition": "In Progress"
+  },
+  {
+    "summary": "auth_v2: enforce MFA (multi-factor auth) on admin scopes",
+    "description": "Gate any token with the admin:* scope behind an MFA step-up. Coordinate with SecOps. Owner: Marcus Lee."
+  },
+  {
+    "summary": "auth_v2: write breaking-change note for mobile clients",
+    "description": "Doc must cover the /v1/login deprecation, new refresh-token TTL, and MFA step-up flow. Needs an owner."
+  },
+  {
+    "summary": "P0: token refresh loop spiking 5xx on auth_v2 canary",
+    "description": "Canary at 5% traffic is returning 5xx in bursts every ~90s, traced to a refresh-token retry loop. Currently mitigating with a circuit breaker. Owner: Ana Chen.",
+    "transition": "In Progress"
+  },
+  {
+    "summary": "Run RCA on Tuesday auth_v2 canary outage",
+    "description": "Root-cause analysis for the 11-minute outage on Tuesday. Publish in the platform Notion by EOW. Owner: Marcus Lee.",
+    "transition": "Done"
+  }
+]

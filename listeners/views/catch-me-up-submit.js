@@ -1,3 +1,4 @@
+import { classifyThread, formatStateBadge } from '../../agent/classifier.js';
 import { runAgent } from '../../agent/index.js';
 import { getPersona } from '../../lib/personas.js';
 
@@ -76,21 +77,32 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, context, 
 
     const { responseText } = await runAgent(prompt, undefined, deps);
 
+    // Phase 4.2 — thread state classifier badge. Best-effort; never blocks the summary.
+    let stateBadgeText = '';
+    try {
+      const stateResult = await classifyThread(messages);
+      stateBadgeText = formatStateBadge(stateResult).text;
+    } catch (err) {
+      logger.warn(`State classification failed: ${err}`);
+    }
+
+    /** @type {any[]} */
+    const blocks = [];
+    if (stateBadgeText) {
+      blocks.push({ type: 'context', elements: [{ type: 'mrkdwn', text: stateBadgeText }] });
+    }
+    blocks.push({ type: 'section', text: { type: 'mrkdwn', text: responseText || '(no response)' } });
+    blocks.push({
+      type: 'context',
+      elements: [{ type: 'mrkdwn', text: `:lock: Only visible to you · Audience: *${persona.label}*` }],
+    });
+
     await client.chat.postEphemeral({
       channel: meta.channelId,
       user: userId,
       thread_ts: meta.threadTs,
       text: responseText || '(no response)',
-      blocks: [
-        {
-          type: 'section',
-          text: { type: 'mrkdwn', text: responseText || '(no response)' },
-        },
-        {
-          type: 'context',
-          elements: [{ type: 'mrkdwn', text: `:lock: Only visible to you · Audience: *${persona.label}*` }],
-        },
-      ],
+      blocks,
     });
   } catch (e) {
     logger.error(`Catch-me-up submission failed: ${e}`);
@@ -99,7 +111,7 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, context, 
         channel: meta.channelId,
         user: userId,
         thread_ts: meta.threadTs,
-        text: `:warning: Ally couldn't summarize this thread: ${e}`,
+        text: ":warning: Ally couldn't summarize this thread. Try again in a moment.",
       });
     } catch {
       /* swallow */

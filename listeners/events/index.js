@@ -1,6 +1,7 @@
 import { handleAppHomeOpened } from './app-home-opened.js';
 import { handleAppMentioned } from './app-mentioned.js';
 import { handleAssistantThreadStarted } from './assistant-thread-started.js';
+import { handleFileShared } from './file-shared.js';
 import { handleMessage } from './message.js';
 
 /**
@@ -13,4 +14,5 @@ export function register(app) {
   app.event('app_mention', handleAppMentioned);
   app.event('assistant_thread_started', handleAssistantThreadStarted);
   app.event('message', handleMessage);
+  app.event('file_shared', handleFileShared);
 }

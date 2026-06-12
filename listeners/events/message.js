@@ -72,7 +72,7 @@ export async function handleMessage({ client, context, event, logger, say, saySt
   } catch (e) {
     logger.error(`Failed to handle message: ${e}`);
     await say({
-      text: `:warning: Something went wrong! (${e})`,
+      text: ":warning: Ally hit an error and couldn't reply. Try again in a moment.",
       thread_ts: event.thread_ts || event.ts,
     });
   }

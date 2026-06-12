@@ -8,7 +8,8 @@
     "start": "node app.js",
     "lint": "npx @biomejs/biome check .",
     "lint:fix": "npx @biomejs/biome check --write .",
-    "test": "node --test"
+    "test": "node --test",
+    "seed:jira": "node scripts/seed-jira.js"
   },
   "dependencies": {
     "@google/genai": "^2.8.0",

@@ -8,7 +8,7 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   appToken: process.env.SLACK_APP_TOKEN,
   socketMode: true,
-  logLevel: LogLevel.DEBUG,
+  logLevel: LogLevel.WARN,
   ignoreSelf: false,
 });
 
@@ -16,5 +16,5 @@ registerListeners(app);
 
 (async () => {
   await app.start();
-  app.logger.info('Starter Agent is running!');
+  app.logger.info('AccessibilityAlly is running.');
 })();

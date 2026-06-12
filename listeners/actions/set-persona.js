@@ -7,7 +7,7 @@ import { buildAppHomeView } from '../views/app-home-builder.js';
  * Stores the choice and re-renders the home view.
  * @param {import('@slack/bolt').SlackActionMiddlewareArgs<import('@slack/bolt').BlockRadioButtonsAction> & import('@slack/bolt').AllMiddlewareArgs} args
  */
-export async function handleSetPersona({ ack, body: _body, client, action, context, logger }) {
+export async function handleSetPersona({ ack, client, action, context, logger }) {
   await ack();
   try {
     const userId = /** @type {string} */ (context.userId);

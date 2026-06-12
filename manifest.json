@@ -2,7 +2,7 @@
   "display_information": {
     "name": "AccessibilityAlly",
     "description": "Makes any Slack thread legible to anyone — PMs in dev channels, new hires, screen-reader users, ESL readers.",
-    "long_description": "AccessibilityAlly is a Slack agent that lowers the cost of understanding. Pick a persona (PM, exec, new hire, plain-language) and Ally rewrites any thread for that audience — defining acronyms, surfacing decisions and owners, and producing screen-reader-friendly output. Powered by Slack AI, the Real-Time Search API (via the Slack MCP server), and MCP integrations with Notion and Jira for canonical context.",
+    "long_description": "AccessibilityAlly is a Slack agent that lowers the cost of understanding. Pick a persona (PM, exec, new hire, plain-language) and Ally rewrites any thread for that audience — defining acronyms, surfacing decisions and owners, and producing screen-reader-friendly output. Powered by Gemini, with Slack search and Jira lookup wired in via native function calling for canonical context.",
     "background_color": "#1f2937"
   },
   "features": {
