@@ -2,7 +2,7 @@
 
 [![Node](https://img.shields.io/badge/node-20.x-339933?logo=node.js&logoColor=white)](https://nodejs.org)
 [![Bolt for JavaScript](https://img.shields.io/badge/Bolt%20for%20JS-4.7-4A154B?logo=slack&logoColor=white)](https://docs.slack.dev/tools/bolt-js/)
-[![Gemini](https://img.shields.io/badge/Gemini-2.0%20Flash-4285F4?logo=google&logoColor=white)](https://ai.google.dev)
+[![Gemini](https://img.shields.io/badge/Gemini-2.5%20Flash-4285F4?logo=google&logoColor=white)](https://ai.google.dev)
 [![Biome](https://img.shields.io/badge/Biome-2.4-60A5FA?logo=biome&logoColor=white)](https://biomejs.dev)
 [![GitHub](https://img.shields.io/badge/github-repo-blue?logo=github)](https://github.com/faketut/AccessibilityAlly)
 
