@@ -1,11 +1,11 @@
 import { classifyThread, formatStateBadge } from '../../agent/classifier.js';
 import { runAgent } from '../../agent/index.js';
-import { getPersona } from '../../lib/personas.js';
+import { getMode } from '../../lib/modes.js';
 
 /**
- * Handle submission of the Catch-me-up persona picker modal.
+ * Handle submission of the Catch-me-up mode picker modal.
  *
- * Fetches the source thread, asks the agent to summarize it for the chosen persona,
+ * Fetches the source thread, asks the agent to summarize it for the chosen mode,
  * and posts the result back to the user as an ephemeral message in the source channel.
  *
  * @param {import('@slack/bolt').AllMiddlewareArgs & import('@slack/bolt').SlackViewMiddlewareArgs<import('@slack/bolt').ViewSubmitAction>} args
@@ -15,10 +15,10 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, context, 
 
   /** @type {{ channelId: string, threadTs: string, messageTs: string }} */
   const meta = JSON.parse(view.private_metadata || '{}');
-  const personaId = view.state.values.persona_block?.persona?.selected_option?.value;
+  const modeId = view.state.values.mode_block?.mode?.selected_option?.value;
   const focus = view.state.values.focus_block?.focus?.value?.trim() || '';
   const userId = body.user.id;
-  const persona = getPersona(personaId);
+  const mode = getMode(modeId);
 
   try {
     // Pull the thread content so we can feed it to the agent.
@@ -46,13 +46,13 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, context, 
     const prompt = [
       `Task: "Catch me up" on the Slack thread below.`,
       `Source channel: <#${meta.channelId}>${permalink ? ` (${permalink})` : ''}`,
-      `Audience persona: ${persona.label}`,
+      `Active mode: ${mode.label}`,
       focus ? `Reader's specific question: ${focus}` : '',
       '',
       'Thread messages (oldest first):',
       messages,
       '',
-      `Produce the output following the ACTIVE PERSONA's MODE; fall back to the DEFAULT OUTPUT TEMPLATE for catch-me-up tasks if the MODE does not override it. Be faithful to the source; if something is unclear, say so.`,
+      'Produce the output following the ACTIVE MODE; fall back to the DEFAULT OUTPUT TEMPLATE for catch-me-up tasks if the MODE does not override it. Be faithful to the source; if something is unclear, say so.',
     ]
       .filter(Boolean)
       .join('\n');
@@ -62,7 +62,7 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, context, 
       channel: meta.channelId,
       user: userId,
       thread_ts: meta.threadTs,
-      text: `:hourglass_flowing_sand: Translating this thread for *${persona.label}*…`,
+      text: `:hourglass_flowing_sand: Translating this thread in *${mode.label}* mode…`,
     });
 
     const deps = {
@@ -72,7 +72,7 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, context, 
       threadTs: meta.threadTs,
       messageTs: meta.messageTs,
       userToken: context.userToken,
-      personaId: persona.id,
+      modeId: mode.id,
     };
 
     const { responseText } = await runAgent(prompt, undefined, deps);
@@ -94,7 +94,7 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, context, 
     blocks.push({ type: 'section', text: { type: 'mrkdwn', text: responseText || '(no response)' } });
     blocks.push({
       type: 'context',
-      elements: [{ type: 'mrkdwn', text: `:lock: Only visible to you · Audience: *${persona.label}*` }],
+      elements: [{ type: 'mrkdwn', text: `:lock: Only visible to you · Mode: *${mode.label}*` }],
     });
 
     await client.chat.postEphemeral({

@@ -6,7 +6,7 @@
 [![Biome](https://img.shields.io/badge/Biome-2.4-60A5FA?logo=biome&logoColor=white)](https://biomejs.dev)
 [![GitHub](https://img.shields.io/badge/github-repo-blue?logo=github)](https://github.com/faketut/AccessibilityAlly)
 
-Every Slack thread is written for the people already in the room — acronyms unexplained, decisions implied, links assumed. **AccessibilityAlly** is the quiet translator who joins late and catches you up: a PM dropped into `#backend-platform`, a new hire on day three, a screen-reader user skimming for the decision, an ESL teammate parsing the jargon. Pick a persona, hit a shortcut, and the thread arrives rewritten for *you* — bottom line first, acronyms defined, decisions and owners surfaced, with a glossary at the end.
+Every Slack thread is written for the people already in the room — acronyms unexplained, decisions implied, links assumed. **AccessibilityAlly** is the quiet translator who joins late and catches you up: a PM dropped into `#backend-platform`, a new hire on day three, a screen-reader user skimming for the decision, an ESL teammate parsing the jargon. Pick a mode, hit a shortcut, and the thread arrives rewritten for *you* — bottom line first, acronyms defined, decisions and owners surfaced, with a glossary at the end.
 
 ---
 
@@ -26,16 +26,16 @@ flowchart TB
   subgraph ally["AccessibilityAlly (Bolt for JS, Socket Mode)"]
     Router["Listener router<br/>app.js + /listeners/index.js"]
     CatchUp["catch-me-up<br/>shortcut + modal + submit"]
-    Cmd["/ally subcommands<br/>persona · plainify · help"]
+    Cmd["/ally subcommands<br/>mode · plainify · help"]
     Chat["@mention / DM handler"]
     AltText["alt-text generator<br/>(file_shared)"]
     Classifier["thread state classifier"]
-    Prefs[("user prefs JSON<br/>persona per user")]
+    Prefs[("user prefs JSON<br/>mode per user")]
     Sessions[("thread session store<br/>in-memory, TTL")]
   end
 
   subgraph ai["Gemini 2.0 Flash"]
-    Text["Text generation<br/>+ persona system prompt"]
+    Text["Text generation<br/>+ mode system prompt"]
     Vision["Multimodal image<br/>understanding"]
     Tools["Function calling<br/>search_slack · fetch_jira_issue"]
   end
@@ -86,11 +86,11 @@ sequenceDiagram
 
   U->>S: Right-click message → "Catch me up"
   S->>A: shortcut(catch_me_up)
-  A->>S: views.open (persona modal)
-  U->>S: Submit persona + optional focus
+  A->>S: views.open (mode modal)
+  U->>S: Submit mode + optional focus
   S->>A: view_submission
   A->>S: conversations.replies
-  A->>G: thread + persona prompt
+  A->>G: thread + mode prompt
   G-->>A: translated summary
   A->>S: chat.postEphemeral (only you)
 ```
@@ -100,7 +100,7 @@ sequenceDiagram
 ```mermaid
 flowchart LR
   U[/ally …/] --> R{subcommand}
-  R -->|persona translate·brief·onboard·simplify| P[Save to prefs] --> M1[DM confirm]
+  R -->|mode translate·brief·onboard·simplify| P[Save to prefs] --> M1[DM confirm]
   R -->|plainify &lt;text&gt;| G[Gemini rewrite] --> M2[Ephemeral reply]
   R -->|help| H[Usage hint]
 ```
@@ -109,22 +109,22 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  M[DM or @mention] --> L[Load persona from prefs]
-  L --> G[Gemini with persona system prompt]
+  M[DM or @mention] --> L[Load mode from prefs]
+  L --> G[Gemini with mode system prompt]
   G --> R[Threaded reply with feedback buttons]
 ```
 
-### App Home persona switch
+### App Home mode switch
 
 ```mermaid
 flowchart LR
-  H[Open App Home] --> V[Render persona radio + MCP status]
-  V --> C[User picks persona] --> S[Save to prefs] --> V
+  H[Open App Home] --> V[Render mode radio + MCP status]
+  V --> C[User picks mode] --> S[Save to prefs] --> V
 ```
 
 ---
 
-## Personas
+## Modes
 
 | id          | for                                              |
 | ----------- | ------------------------------------------------ |

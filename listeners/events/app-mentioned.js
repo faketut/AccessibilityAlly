@@ -35,7 +35,7 @@ export async function handleAppMentioned({ client, context, event, logger, say, 
     });
 
     const existingSessionId = sessionStore.getSession(channelId, threadTs);
-    const personaId = getPrefs(userId).persona;
+    const modeId = getPrefs(userId).mode;
     const deps = {
       client,
       userId,
@@ -43,7 +43,7 @@ export async function handleAppMentioned({ client, context, event, logger, say, 
       threadTs,
       messageTs: event.ts,
       userToken: context.userToken,
-      personaId,
+      modeId,
     };
     const { responseText, sessionId: newSessionId } = await runAgent(cleanedText, existingSessionId ?? undefined, deps);
 

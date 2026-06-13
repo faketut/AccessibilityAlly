@@ -1,24 +1,24 @@
-import { PERSONAS } from '../../lib/personas.js';
+import { MODES } from '../../lib/modes.js';
 
 /** @type {import('@slack/types').PlainTextOption[]} */
-const PERSONA_OPTIONS = PERSONAS.map((p) => ({
-  text: { type: 'plain_text', text: p.label },
-  value: p.id,
-  description: { type: 'plain_text', text: p.description },
+const MODE_OPTIONS = MODES.map((m) => ({
+  text: { type: 'plain_text', text: m.label },
+  value: m.id,
+  description: { type: 'plain_text', text: m.description },
 }));
 
 /**
- * Build the "Catch me up" modal that lets the user pick a persona before Ally
+ * Build the "Catch me up" modal that lets the user pick a mode before Ally
  * summarizes the source thread.
  * @param {Object} params
  * @param {string} params.channelId
  * @param {string} params.threadTs
  * @param {string} params.messageTs
- * @param {string} params.defaultPersonaId
+ * @param {string} params.defaultModeId
  * @returns {import('@slack/types').ModalView}
  */
-export function buildCatchMeUpModal({ channelId, threadTs, messageTs, defaultPersonaId }) {
-  const initial = PERSONA_OPTIONS.find((o) => o.value === defaultPersonaId) ?? PERSONA_OPTIONS[0];
+export function buildCatchMeUpModal({ channelId, threadTs, messageTs, defaultModeId }) {
+  const initial = MODE_OPTIONS.find((o) => o.value === defaultModeId) ?? MODE_OPTIONS[0];
   return {
     type: 'modal',
     callback_id: 'catch_me_up_submit',
@@ -31,18 +31,18 @@ export function buildCatchMeUpModal({ channelId, threadTs, messageTs, defaultPer
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: "I'll read this thread and translate it for the audience you pick. Output is ephemeral — only you will see it.",
+          text: "I'll read this thread and translate it for the mode you pick. Output is ephemeral — only you will see it.",
         },
       },
       {
         type: 'input',
-        block_id: 'persona_block',
-        label: { type: 'plain_text', text: 'Audience' },
+        block_id: 'mode_block',
+        label: { type: 'plain_text', text: 'Mode' },
         element: {
           type: 'radio_buttons',
-          action_id: 'persona',
+          action_id: 'mode',
           initial_option: initial,
-          options: PERSONA_OPTIONS,
+          options: MODE_OPTIONS,
         },
       },
       {

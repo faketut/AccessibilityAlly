@@ -1,5 +1,5 @@
 import { handleFeedbackButton } from './feedback-buttons.js';
-import { handleSetPersona } from './set-persona.js';
+import { handleSetMode } from './set-mode.js';
 
 /**
  * Register action listeners with the Bolt app.
@@ -7,5 +7,5 @@ import { handleSetPersona } from './set-persona.js';
  */
 export function register(app) {
   app.action('feedback', handleFeedbackButton);
-  app.action('set_persona', handleSetPersona);
+  app.action('set_mode', handleSetMode);
 }

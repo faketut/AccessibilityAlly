@@ -10,7 +10,7 @@ export async function handleAppHomeOpened({ client, context, logger }) {
     const userId = /** @type {string} */ (context.userId);
     const prefs = getPrefs(userId);
     const isMcpConnected = !!context.userToken || !!process.env.SLACK_USER_TOKEN;
-    const view = buildAppHomeView({ currentPersonaId: prefs.persona ?? null, isMcpConnected });
+    const view = buildAppHomeView({ currentModeId: prefs.mode ?? null, isMcpConnected });
     await client.views.publish({ user_id: userId, view });
   } catch (e) {
     logger.error(`Failed to publish App Home: ${e}`);

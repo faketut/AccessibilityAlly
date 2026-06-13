@@ -1,11 +1,11 @@
 import { runAgent } from '../../agent/index.js';
-import { getPersona, PERSONAS } from '../../lib/personas.js';
+import { getMode, MODES } from '../../lib/modes.js';
 import { getPrefs, setPrefs } from '../../lib/prefs.js';
 
 const HELP = [
   '*AccessibilityAlly commands*',
-  '• `/ally persona <translate|brief|onboard|simplify>` — set your default audience',
-  '• `/ally persona` — show your current persona',
+  '• `/ally mode <translate|brief|onboard|simplify>` — set your default mode',
+  '• `/ally mode` — show your current mode',
   '• `/ally plainify <text>` — rewrite a snippet in plain language',
   '• `/ally help` — show this help',
   '',
@@ -29,27 +29,27 @@ export async function handleAllyCommand({ ack, command, respond, client, context
       return;
     }
 
-    if (sub === 'persona') {
+    if (sub === 'mode') {
       if (!arg) {
-        const current = getPersona(getPrefs(userId).persona);
+        const current = getMode(getPrefs(userId).mode);
         await respond({
           response_type: 'ephemeral',
-          text: `Your current audience persona is *${current.label}*. Change it with \`/ally persona translate|brief|onboard|simplify\`.`,
+          text: `Your current mode is *${current.label}*. Change it with \`/ally mode translate|brief|onboard|simplify\`.`,
         });
         return;
       }
-      const match = PERSONAS.find((p) => p.id === arg);
+      const match = MODES.find((m) => m.id === arg);
       if (!match) {
         await respond({
           response_type: 'ephemeral',
-          text: `Unknown persona \`${arg}\`. Choose one of: ${PERSONAS.map((p) => `\`${p.id}\``).join(', ')}.`,
+          text: `Unknown mode \`${arg}\`. Choose one of: ${MODES.map((m) => `\`${m.id}\``).join(', ')}.`,
         });
         return;
       }
-      setPrefs(userId, { persona: match.id });
+      setPrefs(userId, { mode: match.id });
       await respond({
         response_type: 'ephemeral',
-        text: `:white_check_mark: Audience set to *${match.label}*. I'll use this when you say "catch me up".`,
+        text: `:white_check_mark: Mode set to *${match.label}*. I'll use this when you say "catch me up".`,
       });
       return;
     }
@@ -59,7 +59,7 @@ export async function handleAllyCommand({ ack, command, respond, client, context
         await respond({ response_type: 'ephemeral', text: 'Usage: `/ally plainify <text to rewrite>`' });
         return;
       }
-      const personaId = getPrefs(userId).persona ?? 'simplify';
+      const modeId = getPrefs(userId).mode ?? 'simplify';
       const deps = {
         client,
         userId,
@@ -67,10 +67,10 @@ export async function handleAllyCommand({ ack, command, respond, client, context
         threadTs: '',
         messageTs: '',
         userToken: context.userToken,
-        personaId,
+        modeId,
       };
       const prompt = [
-        "Task: rewrite the snippet below according to the ACTIVE PERSONA's MODE.",
+        'Task: rewrite the snippet below according to the ACTIVE MODE.',
         'Keep meaning intact. Define every acronym on first use.',
         'Do NOT use the catch-me-up template — output just the rewritten text, then a Glossary section if needed.',
         '',

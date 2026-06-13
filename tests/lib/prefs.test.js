@@ -39,23 +39,23 @@ describe('prefs store', () => {
 
   it('setPrefs persists and getPrefs reads back', async () => {
     const { getPrefs, setPrefs } = await import(`${PREFS_PATH}?t=${Date.now()}`);
-    setPrefs('U123', { persona: 'brief' });
+    setPrefs('U123', { mode: 'brief' });
     const prefs = getPrefs('U123');
-    assert.strictEqual(prefs.persona, 'brief');
+    assert.strictEqual(prefs.mode, 'brief');
   });
 
   it('setPrefs merges patch with existing prefs', async () => {
     const { getPrefs, setPrefs } = await import(`${PREFS_PATH}?t=${Date.now()}`);
-    setPrefs('U123', { persona: 'translate' });
-    setPrefs('U123', { persona: 'simplify' });
-    assert.strictEqual(getPrefs('U123').persona, 'simplify');
+    setPrefs('U123', { mode: 'translate' });
+    setPrefs('U123', { mode: 'simplify' });
+    assert.strictEqual(getPrefs('U123').mode, 'simplify');
   });
 
   it('loads from pre-existing JSON file on first read', async () => {
     mkdirSync(join(tmpDir, '.ally-data'), { recursive: true });
-    writeFileSync(join(tmpDir, '.ally-data', 'user-prefs.json'), JSON.stringify({ UPRE: { persona: 'onboard' } }));
+    writeFileSync(join(tmpDir, '.ally-data', 'user-prefs.json'), JSON.stringify({ UPRE: { mode: 'onboard' } }));
     const { getPrefs } = await import(`${PREFS_PATH}?t=${Date.now()}`);
-    assert.strictEqual(getPrefs('UPRE').persona, 'onboard');
+    assert.strictEqual(getPrefs('UPRE').mode, 'onboard');
   });
 
   it('tolerates a missing or corrupt JSON file', async () => {

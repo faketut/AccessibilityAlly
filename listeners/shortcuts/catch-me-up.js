@@ -2,7 +2,7 @@ import { getPrefs } from '../../lib/prefs.js';
 import { buildCatchMeUpModal } from '../views/catch-me-up-builder.js';
 
 /**
- * Open the persona-picker modal when a user invokes the "Catch me up"
+ * Open the mode-picker modal when a user invokes the "Catch me up"
  * message shortcut on a thread.
  * @param {import('@slack/bolt').AllMiddlewareArgs & import('@slack/bolt').SlackShortcutMiddlewareArgs<import('@slack/bolt').MessageShortcut>} args
  */
@@ -19,7 +19,7 @@ export async function handleCatchMeUpShortcut({ ack, client, shortcut, logger, c
       channelId,
       threadTs,
       messageTs: sourceTs,
-      defaultPersonaId: prefs.persona ?? 'translate',
+      defaultModeId: prefs.mode ?? 'translate',
     });
 
     await client.views.open({ trigger_id: shortcut.trigger_id, view });

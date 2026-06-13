@@ -1,9 +1,9 @@
 import assert from 'node:assert';
 import { describe, it } from 'node:test';
-import { PERSONAS } from '../../../lib/personas.js';
+import { MODES } from '../../../lib/modes.js';
 import { buildCatchMeUpModal } from '../../../listeners/views/catch-me-up-builder.js';
 
-const BASE = { channelId: 'C123', threadTs: '1111.0000', messageTs: '1111.0001', defaultPersonaId: 'translate' };
+const BASE = { channelId: 'C123', threadTs: '1111.0000', messageTs: '1111.0001', defaultModeId: 'translate' };
 
 describe('buildCatchMeUpModal', () => {
   it('returns a modal view with correct callback_id', () => {
@@ -20,32 +20,30 @@ describe('buildCatchMeUpModal', () => {
     assert.strictEqual(meta.messageTs, BASE.messageTs);
   });
 
-  it('contains a persona radio_buttons block with all persona options', () => {
+  it('contains a mode radio_buttons block with all mode options', () => {
     const modal = buildCatchMeUpModal(BASE);
-    const personaBlock = modal.blocks.find(
-      (b) => b.type === 'input' && /** @type {any} */ (b).block_id === 'persona_block',
-    );
-    assert.ok(personaBlock, 'persona_block not found');
-    const el = /** @type {any} */ (personaBlock).element;
+    const modeBlock = modal.blocks.find((b) => b.type === 'input' && /** @type {any} */ (b).block_id === 'mode_block');
+    assert.ok(modeBlock, 'mode_block not found');
+    const el = /** @type {any} */ (modeBlock).element;
     assert.strictEqual(el.type, 'radio_buttons');
-    assert.strictEqual(el.action_id, 'persona');
-    assert.strictEqual(el.options.length, PERSONAS.length);
+    assert.strictEqual(el.action_id, 'mode');
+    assert.strictEqual(el.options.length, MODES.length);
   });
 
-  it('sets initial_option to the supplied defaultPersonaId', () => {
-    for (const p of PERSONAS) {
-      const modal = buildCatchMeUpModal({ ...BASE, defaultPersonaId: p.id });
-      const personaBlock = modal.blocks.find((b) => /** @type {any} */ (b).block_id === 'persona_block');
-      const el = /** @type {any} */ (personaBlock).element;
-      assert.strictEqual(el.initial_option.value, p.id, `initial_option wrong for persona ${p.id}`);
+  it('sets initial_option to the supplied defaultModeId', () => {
+    for (const m of MODES) {
+      const modal = buildCatchMeUpModal({ ...BASE, defaultModeId: m.id });
+      const modeBlock = modal.blocks.find((b) => /** @type {any} */ (b).block_id === 'mode_block');
+      const el = /** @type {any} */ (modeBlock).element;
+      assert.strictEqual(el.initial_option.value, m.id, `initial_option wrong for mode ${m.id}`);
     }
   });
 
-  it('falls back to first option for unknown defaultPersonaId', () => {
-    const modal = buildCatchMeUpModal({ ...BASE, defaultPersonaId: 'unknown_xyz' });
-    const personaBlock = modal.blocks.find((b) => /** @type {any} */ (b).block_id === 'persona_block');
-    const el = /** @type {any} */ (personaBlock).element;
-    assert.strictEqual(el.initial_option.value, PERSONAS[0].id);
+  it('falls back to first option for unknown defaultModeId', () => {
+    const modal = buildCatchMeUpModal({ ...BASE, defaultModeId: 'unknown_xyz' });
+    const modeBlock = modal.blocks.find((b) => /** @type {any} */ (b).block_id === 'mode_block');
+    const el = /** @type {any} */ (modeBlock).element;
+    assert.strictEqual(el.initial_option.value, MODES[0].id);
   });
 
   it('contains an optional focus text-input block', () => {

@@ -1,6 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 
-import { personaPromptFragment } from '../lib/personas.js';
+import { modePromptFragment } from '../lib/modes.js';
 import { fetchJiraIssue, searchSlack } from './tools.js';
 
 const SYSTEM_PROMPT = `\
@@ -13,7 +13,7 @@ non-native English speakers, neurodivergent readers, and non-technical staff. Yo
 lower the cost of understanding without losing fidelity.
 
 ## OPERATING MODE
-Every response is shaped by exactly one of four MODES, set in the ACTIVE PERSONA section
+Every response is shaped by exactly one of four MODES, set in the ACTIVE MODE section
 appended at the end of this prompt:
 - **TRANSLATE** — for a cross-functional PM. Define jargon, surface decisions and owners.
 - **BRIEF** — for an executive. Two bullets max: what changed, the impact, who owns it.
@@ -46,10 +46,10 @@ Use tools when they would change your answer. Do not narrate that you are using 
 - Do not guess external facts when a tool can verify them.
 
 ## DEFAULT OUTPUT TEMPLATE for "catch me up" tasks
-Use these sections, in this order, skipping any that are empty. The ACTIVE PERSONA's MODE may
+Use these sections, in this order, skipping any that are empty. The ACTIVE MODE may
 override or collapse this template (notably BRIEF, which produces only two bullets):
 1. **TL;DR** — one or two sentences.
-2. **Why this matters to you** — one line framed for the active persona.
+2. **Why this matters to you** — one line framed for the active mode.
 3. **Decisions made** — bullet list.
 4. **Open questions / blockers** — bullet list with owner if known.
 5. **What to do next** — concrete action for the reader.
@@ -65,7 +65,7 @@ For free-form chat outside of "catch me up", just follow the principles and the 
  * @property {string} threadTs
  * @property {string} messageTs
  * @property {string} [userToken]
- * @property {string} [personaId]
+ * @property {string} [modeId]
  */
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
@@ -125,12 +125,12 @@ async function dispatchToolCall(call, deps) {
  * Run the agent with the given text and optional session ID.
  * @param {string} text - The user's message text.
  * @param {string} [sessionId] - Unused; kept for interface compatibility.
- * @param {AgentDeps} [deps] - Dependencies for persona selection.
+ * @param {AgentDeps} [deps] - Dependencies for mode selection.
  * @returns {Promise<{responseText: string, sessionId: string | null}>}
  */
 export async function runAgent(text, sessionId = undefined, deps = undefined) {
   void sessionId;
-  const systemInstruction = SYSTEM_PROMPT + personaPromptFragment(deps?.personaId);
+  const systemInstruction = SYSTEM_PROMPT + modePromptFragment(deps?.modeId);
 
   /** @type {Array<{ role: 'user' | 'model', parts: Array<Record<string, unknown>> }>} */
   const contents = [{ role: 'user', parts: [{ text }] }];

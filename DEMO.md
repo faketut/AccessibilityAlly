@@ -48,17 +48,17 @@ Replies can add more detail, but the important thing is that the thread feels de
 
 ## 3. Demo flow
 
-### A. Persona switch
+### A. Mode switch
 
-1. Open the bot DM or use `/ally persona translate`.
-2. Show that Ally remembers the audience setting.
-3. Switch to `/ally persona brief` and point out that the tone changes to a tighter summary.
+1. Open the bot DM or use `/ally mode translate`.
+2. Show that Ally remembers the mode setting.
+3. Switch to `/ally mode brief` and point out that the tone changes to a tighter summary.
 
 ### B. Catch me up
 
 1. Right-click the top message in the thread.
 2. Choose **More message shortcuts → Catch me up**.
-3. Pick a persona and optionally add a focus question.
+3. Pick a mode and optionally add a focus question.
 4. Call out the output shape:
    - TL;DR first
    - Decisions and blockers
@@ -73,7 +73,7 @@ Replies can add more detail, but the important thing is that the thread feels de
 ### D. App Home
 
 1. Open the app's Home tab.
-2. Show the persona picker and the Slack Real-Time Search status.
+2. Show the mode picker and the Slack Real-Time Search status.
 
 ### E. Alt text
 
@@ -85,7 +85,7 @@ Replies can add more detail, but the important thing is that the thread feels de
 ## 4. What to emphasize while recording
 
 - The same thread means different things to different readers.
-- Persona selection changes the summary, not just the wording.
+- Mode selection changes the summary, not just the wording.
 - Accessibility is built into the workflow, not added as a separate feature.
 - The app keeps the response ephemeral, which matches the privacy posture.
 
@@ -93,4 +93,4 @@ Replies can add more detail, but the important thing is that the thread feels de
 
 ## 5. Clean finish
 
-If you want to reset the demo, just clear the channel thread and change the persona back to the default in App Home.
+If you want to reset the demo, just clear the channel thread and change the mode back to the default in App Home.

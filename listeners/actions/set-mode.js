@@ -1,22 +1,22 @@
-import { getPersona } from '../../lib/personas.js';
+import { getMode } from '../../lib/modes.js';
 import { setPrefs } from '../../lib/prefs.js';
 import { buildAppHomeView } from '../views/app-home-builder.js';
 
 /**
- * Handle persona radio-button selection from App Home.
+ * Handle mode radio-button selection from App Home.
  * Stores the choice and re-renders the home view.
  * @param {import('@slack/bolt').SlackActionMiddlewareArgs<import('@slack/bolt').BlockRadioButtonsAction> & import('@slack/bolt').AllMiddlewareArgs} args
  */
-export async function handleSetPersona({ ack, client, action, context, logger }) {
+export async function handleSetMode({ ack, client, action, context, logger }) {
   await ack();
   try {
     const userId = /** @type {string} */ (context.userId);
     const selected = /** @type {any} */ (action).selected_option?.value;
-    const persona = getPersona(selected);
-    setPrefs(userId, { persona: persona.id });
+    const mode = getMode(selected);
+    setPrefs(userId, { mode: mode.id });
 
     const view = buildAppHomeView({
-      currentPersonaId: persona.id,
+      currentModeId: mode.id,
       isMcpConnected: !!context.userToken || !!process.env.SLACK_USER_TOKEN,
     });
     await client.views.publish({ user_id: userId, view });
@@ -24,9 +24,9 @@ export async function handleSetPersona({ ack, client, action, context, logger })
     // Confirm in DM so the user sees feedback even if they navigate away.
     await client.chat.postMessage({
       channel: userId,
-      text: `:white_check_mark: Audience persona set to *${persona.label}*.`,
+      text: `:white_check_mark: Mode set to *${mode.label}*.`,
     });
   } catch (e) {
-    logger.error(`set-persona action failed: ${e}`);
+    logger.error(`set-mode action failed: ${e}`);
   }
 }

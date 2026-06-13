@@ -49,7 +49,7 @@ export async function handleMessage({ client, context, event, logger, say, saySt
       ],
     });
 
-    const personaId = getPrefs(userId).persona;
+    const modeId = getPrefs(userId).mode;
     const deps = {
       client,
       userId,
@@ -57,7 +57,7 @@ export async function handleMessage({ client, context, event, logger, say, saySt
       threadTs,
       messageTs: event.ts,
       userToken: context.userToken,
-      personaId,
+      modeId,
     };
     const { responseText, sessionId: newSessionId } = await runAgent(text, existingSessionId ?? undefined, deps);
 

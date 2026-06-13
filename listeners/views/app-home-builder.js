@@ -1,21 +1,21 @@
-import { getPersona, PERSONAS } from '../../lib/personas.js';
+import { getMode, MODES } from '../../lib/modes.js';
 
 /**
  * Build the App Home Block Kit view for AccessibilityAlly.
- * Shows the persona picker plus a brief explanation of what Ally does.
+ * Shows the mode picker plus a brief explanation of what Ally does.
  *
  * @param {Object} [opts]
- * @param {string | null} [opts.currentPersonaId]
+ * @param {string | null} [opts.currentModeId]
  * @param {boolean} [opts.isMcpConnected]
  * @returns {import('@slack/types').HomeView}
  */
-export function buildAppHomeView({ currentPersonaId = null, isMcpConnected = false } = {}) {
-  const current = getPersona(currentPersonaId);
+export function buildAppHomeView({ currentModeId = null, isMcpConnected = false } = {}) {
+  const current = getMode(currentModeId);
   /** @type {import('@slack/types').PlainTextOption[]} */
-  const options = PERSONAS.map((p) => ({
-    text: { type: 'plain_text', text: p.label },
-    value: p.id,
-    description: { type: 'plain_text', text: p.description },
+  const options = MODES.map((m) => ({
+    text: { type: 'plain_text', text: m.label },
+    value: m.id,
+    description: { type: 'plain_text', text: m.description },
   }));
   const initial = options.find((o) => o.value === current.id) ?? options[0];
 
@@ -32,24 +32,24 @@ export function buildAppHomeView({ currentPersonaId = null, isMcpConnected = fal
         text:
           'I make any Slack thread legible to *anyone* — PMs visiting dev channels, new hires, screen-reader users, and non-native English readers.\n\n' +
           '*How to use me:*\n' +
-          "• Right-click any thread → *More actions* → *Catch me up* — I'll summarize for your persona\n" +
+          "• Right-click any thread → *More actions* → *Catch me up* — I'll summarize for your mode\n" +
           '• `/ally plainify <text>` — rewrite a snippet in plain language\n' +
-          '• `/ally persona <translate|brief|onboard|simplify>` — change your default audience\n' +
+          '• `/ally mode <translate|brief|onboard|simplify>` — change your default mode\n' +
           '• DM me or `@ally` in a channel for free-form questions',
       },
     },
     { type: 'divider' },
     {
       type: 'section',
-      text: { type: 'mrkdwn', text: '*Your audience persona*\nThis shapes how I write for you.' },
+      text: { type: 'mrkdwn', text: '*Your mode*\nThis shapes how I write for you.' },
     },
     {
       type: 'actions',
-      block_id: 'persona_actions',
+      block_id: 'mode_actions',
       elements: [
         {
           type: 'radio_buttons',
-          action_id: 'set_persona',
+          action_id: 'set_mode',
           initial_option: initial,
           options,
         },
@@ -72,7 +72,7 @@ export function buildAppHomeView({ currentPersonaId = null, isMcpConnected = fal
       elements: [
         {
           type: 'mrkdwn',
-          text: ':lock: All summaries are ephemeral — only you see them. Ally stores only your persona preference and (optionally) a glossary of acronyms it has seen.',
+          text: ':lock: All summaries are ephemeral — only you see them. Ally stores only your mode preference and (optionally) a glossary of acronyms it has seen.',
         },
       ],
     },
