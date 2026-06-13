@@ -1,6 +1,7 @@
 import { classifyThread, formatStateBadge } from '../../agent/classifier.js';
 import { runAgent } from '../../agent/index.js';
 import { getMode } from '../../lib/modes.js';
+import { chunkReplyBlocks } from '../../lib/reply-blocks.js';
 
 /**
  * Handle submission of the Catch-me-up mode picker modal.
@@ -91,7 +92,9 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, context, 
     if (stateBadgeText) {
       blocks.push({ type: 'context', elements: [{ type: 'mrkdwn', text: stateBadgeText }] });
     }
-    blocks.push({ type: 'section', text: { type: 'mrkdwn', text: responseText || '(no response)' } });
+    for (const b of chunkReplyBlocks(responseText)) {
+      blocks.push(b);
+    }
     blocks.push({
       type: 'context',
       elements: [{ type: 'mrkdwn', text: `:lock: Only visible to you · Mode: *${mode.label}*` }],

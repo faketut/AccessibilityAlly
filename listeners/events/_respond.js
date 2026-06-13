@@ -1,5 +1,6 @@
 import { runAgent } from '../../agent/index.js';
 import { getPrefs } from '../../lib/prefs.js';
+import { chunkReplyBlocks } from '../../lib/reply-blocks.js';
 import { buildFeedbackBlocks } from '../views/feedback-builder.js';
 
 const STATUS = {
@@ -41,5 +42,7 @@ export async function respondAsAlly({ client, context, event, sayStream, setStat
   const { responseText } = await runAgent(text, deps);
   const streamer = sayStream();
   await streamer.append({ markdown_text: responseText });
-  await streamer.stop({ blocks: buildFeedbackBlocks() });
+  // Finalize with structured blocks: chunked sections (better visual hierarchy
+  // and screen-reader semantics than one giant mrkdwn block) + feedback buttons.
+  await streamer.stop({ blocks: [...chunkReplyBlocks(responseText), ...buildFeedbackBlocks()] });
 }
