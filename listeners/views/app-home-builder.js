@@ -34,7 +34,7 @@ export function buildAppHomeView({ currentPersonaId = null, isMcpConnected = fal
           '*How to use me:*\n' +
           "• Right-click any thread → *More actions* → *Catch me up* — I'll summarize for your persona\n" +
           '• `/ally plainify <text>` — rewrite a snippet in plain language\n' +
-          '• `/ally persona <pm|exec|new_hire|plain>` — change your default audience\n' +
+          '• `/ally persona <translate|brief|onboard|simplify>` — change your default audience\n' +
           '• DM me or `@ally` in a channel for free-form questions',
       },
     },

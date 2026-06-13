@@ -19,7 +19,7 @@ export async function handleCatchMeUpShortcut({ ack, client, shortcut, logger, c
       channelId,
       threadTs,
       messageTs: sourceTs,
-      defaultPersonaId: prefs.persona ?? 'pm',
+      defaultPersonaId: prefs.persona ?? 'translate',
     });
 
     await client.views.open({ trigger_id: shortcut.trigger_id, view });

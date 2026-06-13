@@ -3,7 +3,7 @@ import { describe, it } from 'node:test';
 import { PERSONAS } from '../../../lib/personas.js';
 import { buildCatchMeUpModal } from '../../../listeners/views/catch-me-up-builder.js';
 
-const BASE = { channelId: 'C123', threadTs: '1111.0000', messageTs: '1111.0001', defaultPersonaId: 'pm' };
+const BASE = { channelId: 'C123', threadTs: '1111.0000', messageTs: '1111.0001', defaultPersonaId: 'translate' };
 
 describe('buildCatchMeUpModal', () => {
   it('returns a modal view with correct callback_id', () => {

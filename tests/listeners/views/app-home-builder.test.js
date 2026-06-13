@@ -26,12 +26,12 @@ describe('buildAppHomeView', () => {
   });
 
   it('marks the supplied current persona as the initial option', () => {
-    const view = buildAppHomeView({ currentPersonaId: 'plain' });
+    const view = buildAppHomeView({ currentPersonaId: 'simplify' });
     const actions = view.blocks.find(
       (b) => b.type === 'actions' && /** @type {any} */ (b).block_id === 'persona_actions',
     );
     const radios = /** @type {any} */ (actions).elements[0];
-    assert.strictEqual(radios.initial_option.value, 'plain');
+    assert.strictEqual(radios.initial_option.value, 'simplify');
   });
 
   it('shows connected status when MCP is connected', () => {

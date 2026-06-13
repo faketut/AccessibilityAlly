@@ -100,7 +100,7 @@ sequenceDiagram
 ```mermaid
 flowchart LR
   U[/ally …/] --> R{subcommand}
-  R -->|persona pm·exec·new_hire·plain| P[Save to prefs] --> M1[DM confirm]
+  R -->|persona translate·brief·onboard·simplify| P[Save to prefs] --> M1[DM confirm]
   R -->|plainify &lt;text&gt;| G[Gemini rewrite] --> M2[Ephemeral reply]
   R -->|help| H[Usage hint]
 ```
@@ -126,12 +126,12 @@ flowchart LR
 
 ## Personas
 
-| id         | for                                               |
-| ---------- | ------------------------------------------------- |
-| `pm`       | cross-functional visitor in a technical channel   |
-| `exec`     | leader who needs the decision and the risk        |
-| `new_hire` | someone with zero tribal knowledge                |
-| `plain`    | plain-language, screen-reader & ESL friendly      |
+| id          | for                                              |
+| ----------- | ------------------------------------------------ |
+| `translate` | cross-functional PM visiting a technical channel |
+| `brief`     | executive who needs the decision and the risk    |
+| `onboard`   | new hire with zero tribal knowledge              |
+| `simplify`  | plain-language, screen-reader & ESL friendly     |
 
 ---
 

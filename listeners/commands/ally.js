@@ -4,7 +4,7 @@ import { getPrefs, setPrefs } from '../../lib/prefs.js';
 
 const HELP = [
   '*AccessibilityAlly commands*',
-  '• `/ally persona <pm|exec|new_hire|plain>` — set your default audience',
+  '• `/ally persona <translate|brief|onboard|simplify>` — set your default audience',
   '• `/ally persona` — show your current persona',
   '• `/ally plainify <text>` — rewrite a snippet in plain language',
   '• `/ally help` — show this help',
@@ -34,7 +34,7 @@ export async function handleAllyCommand({ ack, command, respond, client, context
         const current = getPersona(getPrefs(userId).persona);
         await respond({
           response_type: 'ephemeral',
-          text: `Your current audience persona is *${current.label}*. Change it with \`/ally persona pm|exec|new_hire|plain\`.`,
+          text: `Your current audience persona is *${current.label}*. Change it with \`/ally persona translate|brief|onboard|simplify\`.`,
         });
         return;
       }
@@ -59,7 +59,7 @@ export async function handleAllyCommand({ ack, command, respond, client, context
         await respond({ response_type: 'ephemeral', text: 'Usage: `/ally plainify <text to rewrite>`' });
         return;
       }
-      const personaId = getPrefs(userId).persona ?? 'plain';
+      const personaId = getPrefs(userId).persona ?? 'simplify';
       const deps = {
         client,
         userId,
@@ -70,8 +70,8 @@ export async function handleAllyCommand({ ack, command, respond, client, context
         personaId,
       };
       const prompt = [
-        'Task: rewrite the snippet below in plain language for the active persona.',
-        'Keep meaning intact. Define every acronym on first use. Use short sentences.',
+        "Task: rewrite the snippet below according to the ACTIVE PERSONA's MODE.",
+        'Keep meaning intact. Define every acronym on first use.',
         'Do NOT use the catch-me-up template — output just the rewritten text, then a Glossary section if needed.',
         '',
         'Snippet:',

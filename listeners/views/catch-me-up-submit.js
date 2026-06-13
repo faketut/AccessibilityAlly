@@ -52,7 +52,7 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, context, 
       'Thread messages (oldest first):',
       messages,
       '',
-      `Produce the output in the "OUTPUT TEMPLATE for catch-me-up tasks" format. Be faithful to the source; if something is unclear, say so.`,
+      `Produce the output following the ACTIVE PERSONA's MODE; fall back to the DEFAULT OUTPUT TEMPLATE for catch-me-up tasks if the MODE does not override it. Be faithful to the source; if something is unclear, say so.`,
     ]
       .filter(Boolean)
       .join('\n');
