@@ -14,7 +14,7 @@ If the image contains readable text (a screenshot, diagram, chart), include the 
  */
 export async function describeImage(imageBuffer, mimeType) {
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.5-flash-lite',
     contents: [
       {
         role: 'user',
