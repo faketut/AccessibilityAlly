@@ -118,7 +118,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  H[Open App Home] --> V[Render mode radio + MCP status]
+  H[Open App Home] --> V[Render mode radio + search status]
   V --> C[User picks mode] --> S[Save to prefs] --> V
 ```
 

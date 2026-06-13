@@ -6,10 +6,10 @@ import { getMode, MODES } from '../../lib/modes.js';
  *
  * @param {Object} [opts]
  * @param {string | null} [opts.currentModeId]
- * @param {boolean} [opts.isMcpConnected]
+ * @param {boolean} [opts.isSearchEnabled]
  * @returns {import('@slack/types').HomeView}
  */
-export function buildAppHomeView({ currentModeId = null, isMcpConnected = false } = {}) {
+export function buildAppHomeView({ currentModeId = null, isSearchEnabled = false } = {}) {
   const current = getMode(currentModeId);
   /** @type {import('@slack/types').PlainTextOption[]} */
   const options = MODES.map((m) => ({
@@ -61,7 +61,7 @@ export function buildAppHomeView({ currentModeId = null, isMcpConnected = false 
       elements: [
         {
           type: 'mrkdwn',
-          text: isMcpConnected
+          text: isSearchEnabled
             ? ':white_check_mark: *Slack Real-Time Search is connected.* I can search workspace history for backstory and acronym definitions.'
             : ':warning: *Slack Real-Time Search is not connected.* Set `SLACK_USER_TOKEN` (dev mode) or run OAuth flow to enable cross-channel search.',
         },

@@ -17,7 +17,7 @@ export async function handleSetMode({ ack, client, action, context, logger }) {
 
     const view = buildAppHomeView({
       currentModeId: mode.id,
-      isMcpConnected: !!context.userToken || !!process.env.SLACK_USER_TOKEN,
+      isSearchEnabled: !!context.userToken || !!process.env.SLACK_USER_TOKEN,
     });
     await client.views.publish({ user_id: userId, view });
 

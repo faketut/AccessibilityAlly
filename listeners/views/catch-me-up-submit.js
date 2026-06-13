@@ -77,7 +77,7 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, context, 
 
     const { responseText } = await runAgent(prompt, undefined, deps);
 
-    // Phase 4.2 — thread state classifier badge. Best-effort; never blocks the summary.
+    // Thread state classifier badge. Best-effort; never blocks the summary.
     let stateBadgeText = '';
     try {
       const stateResult = await classifyThread(messages);

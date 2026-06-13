@@ -30,8 +30,8 @@ describe('buildAppHomeView', () => {
     assert.strictEqual(radios.initial_option.value, 'simplify');
   });
 
-  it('shows connected status when MCP is connected', () => {
-    const view = buildAppHomeView({ isMcpConnected: true });
+  it('shows connected status when Slack search is enabled', () => {
+    const view = buildAppHomeView({ isSearchEnabled: true });
     const text = view.blocks
       .filter((b) => b.type === 'context')
       .flatMap((b) => /** @type {any} */ (b).elements.map((e) => e.text))
@@ -40,8 +40,8 @@ describe('buildAppHomeView', () => {
     assert.ok(!text.includes('not connected'));
   });
 
-  it('shows a warning when MCP is not connected', () => {
-    const view = buildAppHomeView({ isMcpConnected: false });
+  it('shows a warning when Slack search is not enabled', () => {
+    const view = buildAppHomeView({ isSearchEnabled: false });
     const text = view.blocks
       .filter((b) => b.type === 'context')
       .flatMap((b) => /** @type {any} */ (b).elements.map((e) => e.text))
