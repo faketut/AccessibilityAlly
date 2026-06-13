@@ -3,6 +3,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import { join, resolve } from 'node:path';
 import { afterEach, beforeEach, describe, it } from 'node:test';
+import { pathToFileURL } from 'node:url';
 
 // Isolate each test by pointing the store at a temp directory.
 // We do this by overriding process.cwd() via an environment detour:
@@ -13,7 +14,7 @@ import { afterEach, beforeEach, describe, it } from 'node:test';
 // We achieve this with dynamic import() which Node caches per specifier —
 // so we need a per-test unique query string to bust the cache.
 
-const PREFS_PATH = resolve(import.meta.dirname, '../../lib/prefs.js');
+const PREFS_PATH = pathToFileURL(resolve(import.meta.dirname, '../../lib/prefs.js')).href;
 
 let tmpDir = '';
 const origCwd = process.cwd;
