@@ -51,8 +51,8 @@ Replies can add more detail, but the important thing is that the thread feels de
 ### A. Mode switch
 
 1. Open the bot DM or use `/ally mode translate`.
-2. Show that Ally remembers the mode setting.
-3. Switch to `/ally mode brief` and point out that the tone changes to a tighter summary.
+2. Run `/ally mode` (no arg) to confirm Ally remembers the setting.
+3. Switch to `/ally mode brief`, then DM Ally or do a Catch me up to see how the tone tightens. (Mode changes only take effect on the next agent invocation; the slash command itself just stores the preference.)
 
 ### B. Catch me up
 

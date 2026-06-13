@@ -167,6 +167,7 @@ export async function runAgent(text, deps = undefined) {
     contents.push({ role: 'user', parts: toolResponses });
   }
 
+  console.warn('runAgent: hit 4-iteration tool-loop cap without a final response.');
   return {
     responseText: 'I could not finish gathering context from tools in time. Please try again.',
   };
