@@ -122,14 +122,12 @@ async function dispatchToolCall(call, deps) {
 }
 
 /**
- * Run the agent with the given text and optional session ID.
+ * Run the agent with the given text.
  * @param {string} text - The user's message text.
- * @param {string} [sessionId] - Unused; kept for interface compatibility.
- * @param {AgentDeps} [deps] - Dependencies for mode selection.
- * @returns {Promise<{responseText: string, sessionId: string | null}>}
+ * @param {AgentDeps} [deps] - Dependencies for tool calls and mode selection.
+ * @returns {Promise<{responseText: string}>}
  */
-export async function runAgent(text, sessionId = undefined, deps = undefined) {
-  void sessionId;
+export async function runAgent(text, deps = undefined) {
   const systemInstruction = SYSTEM_PROMPT + modePromptFragment(deps?.modeId);
 
   /** @type {Array<{ role: 'user' | 'model', parts: Array<Record<string, unknown>> }>} */
@@ -147,7 +145,7 @@ export async function runAgent(text, sessionId = undefined, deps = undefined) {
 
     const calls = (response.functionCalls || []).filter((call) => !!call.name);
     if (calls.length === 0) {
-      return { responseText: response.text ?? '', sessionId: null };
+      return { responseText: response.text ?? '' };
     }
 
     contents.push({ role: 'model', parts: calls.map((call) => ({ functionCall: call })) });
@@ -171,6 +169,5 @@ export async function runAgent(text, sessionId = undefined, deps = undefined) {
 
   return {
     responseText: 'I could not finish gathering context from tools in time. Please try again.',
-    sessionId: null,
   };
 }

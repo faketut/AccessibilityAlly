@@ -1,7 +1,4 @@
-import { runAgent } from '../../agent/index.js';
-import { getPrefs } from '../../lib/prefs.js';
-import { sessionStore } from '../../thread-context/index.js';
-import { buildFeedbackBlocks } from '../views/feedback-builder.js';
+import { respondAsAlly } from './_respond.js';
 
 /**
  * @param {import('@slack/types').MessageEvent} event
@@ -12,63 +9,20 @@ function isGenericMessageEvent(event) {
 }
 
 /**
- * Handle messages sent to Ally via DM or in threads it is already part of.
+ * Handle DM messages sent to Ally.
+ *
+ * Thread replies in channels are handled via @mention or the catch-me-up shortcut;
+ * we don't auto-join threads here.
+ *
  * @param {import('@slack/bolt').AllMiddlewareArgs & import('@slack/bolt').SlackEventMiddlewareArgs<'message'>} args
  */
 export async function handleMessage({ client, context, event, logger, say, sayStream, setStatus }) {
   if (!isGenericMessageEvent(event)) return;
   if (event.bot_id) return;
-
-  const isDm = event.channel_type === 'im';
-  const isThreadReply = !!event.thread_ts;
-
-  if (isDm) {
-    // DMs are always handled
-  } else if (isThreadReply) {
-    const session = sessionStore.getSession(event.channel, /** @type {string} */ (event.thread_ts));
-    if (session === null) return;
-  } else {
-    return;
-  }
+  if (event.channel_type !== 'im') return;
 
   try {
-    const channelId = event.channel;
-    const text = event.text || '';
-    const threadTs = event.thread_ts || event.ts;
-    const userId = /** @type {string} */ (context.userId);
-
-    const existingSessionId = sessionStore.getSession(channelId, threadTs);
-
-    await setStatus({
-      status: 'Translating\u2026',
-      loading_messages: [
-        'Reading the thread carefully\u2026',
-        'Looking up acronyms\u2026',
-        'Finding owners and decisions\u2026',
-        'Writing for your audience\u2026',
-      ],
-    });
-
-    const modeId = getPrefs(userId).mode;
-    const deps = {
-      client,
-      userId,
-      channelId,
-      threadTs,
-      messageTs: event.ts,
-      userToken: context.userToken,
-      modeId,
-    };
-    const { responseText, sessionId: newSessionId } = await runAgent(text, existingSessionId ?? undefined, deps);
-
-    const streamer = sayStream();
-    await streamer.append({ markdown_text: responseText });
-    const feedbackBlocks = buildFeedbackBlocks();
-    await streamer.stop({ blocks: feedbackBlocks });
-
-    if (newSessionId) {
-      sessionStore.setSession(channelId, threadTs, newSessionId);
-    }
+    await respondAsAlly({ client, context, event, sayStream, setStatus, text: event.text || '' });
   } catch (e) {
     logger.error(`Failed to handle message: ${e}`);
     await say({

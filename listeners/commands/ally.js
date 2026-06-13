@@ -77,7 +77,7 @@ export async function handleAllyCommand({ ack, command, respond, client, context
         'Snippet:',
         arg,
       ].join('\n');
-      const { responseText } = await runAgent(prompt, undefined, deps);
+      const { responseText } = await runAgent(prompt, deps);
       await respond({ response_type: 'ephemeral', text: responseText || '(no response)' });
       return;
     }
