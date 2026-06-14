@@ -7,17 +7,17 @@ describe('chunkReplyBlocks', () => {
   it('returns a placeholder block for empty input', () => {
     const blocks = chunkReplyBlocks('');
     assert.strictEqual(blocks.length, 1);
-    assert.strictEqual(blocks[0].type, 'section');
-    assert.match(blocks[0].text.text, /no response/i);
+    assert.strictEqual(blocks[0].type, 'markdown');
+    assert.match(blocks[0].text, /no response/i);
   });
 
-  it('returns a single section block when there are no headings (e.g. Brief mode)', () => {
+  it('returns a single markdown block when there are no headings (e.g. Brief mode)', () => {
     const brief =
       '• auth_v2 rollout blocked on canary error spike. Owner: Ana.\n• Migration on hold until rollback patch lands.';
     const blocks = chunkReplyBlocks(brief);
     assert.strictEqual(blocks.length, 1);
-    assert.strictEqual(blocks[0].type, 'section');
-    assert.strictEqual(blocks[0].text.text, brief);
+    assert.strictEqual(blocks[0].type, 'markdown');
+    assert.strictEqual(blocks[0].text, brief);
   });
 
   it('splits on CommonMark **Bold** headings and inserts dividers', () => {
@@ -33,10 +33,10 @@ describe('chunkReplyBlocks', () => {
     ].join('\n');
     const blocks = chunkReplyBlocks(text);
     const types = blocks.map((b) => b.type);
-    assert.deepStrictEqual(types, ['section', 'divider', 'section', 'divider', 'section']);
-    assert.match(blocks[0].text.text, /^\*TL;DR\*\nRollout blocked\.$/);
-    assert.match(blocks[2].text.text, /^\*Decisions made\*\n- Hold migration/);
-    assert.match(blocks[4].text.text, /^\*Glossary\*\n- auth_v2/);
+    assert.deepStrictEqual(types, ['markdown', 'divider', 'markdown', 'divider', 'markdown']);
+    assert.match(blocks[0].text, /^## TL;DR\nRollout blocked\.$/);
+    assert.match(blocks[2].text, /^## Decisions made\n- Hold migration/);
+    assert.match(blocks[4].text, /^## Glossary\n- auth_v2/);
   });
 
   it('splits on Slack *Bold* headings (own-line)', () => {
@@ -44,7 +44,7 @@ describe('chunkReplyBlocks', () => {
     const blocks = chunkReplyBlocks(text);
     assert.deepStrictEqual(
       blocks.map((b) => b.type),
-      ['section', 'divider', 'section'],
+      ['markdown', 'divider', 'markdown'],
     );
   });
 
@@ -52,7 +52,7 @@ describe('chunkReplyBlocks', () => {
     const text = '* first bullet\n* second bullet\n* third bullet';
     const blocks = chunkReplyBlocks(text);
     assert.strictEqual(blocks.length, 1);
-    assert.strictEqual(blocks[0].text.text, text);
+    assert.strictEqual(blocks[0].text, text);
   });
 
   it('splits on ## CommonMark headers', () => {
@@ -60,9 +60,9 @@ describe('chunkReplyBlocks', () => {
     const blocks = chunkReplyBlocks(text);
     assert.deepStrictEqual(
       blocks.map((b) => b.type),
-      ['section', 'divider', 'section'],
+      ['markdown', 'divider', 'markdown'],
     );
-    assert.match(blocks[0].text.text, /^\*Backstory\*\n/);
+    assert.match(blocks[0].text, /^## Backstory\n/);
   });
 
   it('splits on ALL CAPS LABEL: headings', () => {
@@ -70,7 +70,7 @@ describe('chunkReplyBlocks', () => {
     const blocks = chunkReplyBlocks(text);
     assert.deepStrictEqual(
       blocks.map((b) => b.type),
-      ['section', 'divider', 'section'],
+      ['markdown', 'divider', 'markdown'],
     );
   });
 
@@ -79,16 +79,16 @@ describe('chunkReplyBlocks', () => {
     const blocks = chunkReplyBlocks(text);
     assert.deepStrictEqual(
       blocks.map((b) => b.type),
-      ['section', 'divider', 'section'],
+      ['markdown', 'divider', 'markdown'],
     );
-    assert.strictEqual(blocks[0].text.text, 'Quick note before headings.');
-    assert.match(blocks[2].text.text, /^\*TL;DR\*\nMain summary\.$/);
+    assert.strictEqual(blocks[0].text, 'Quick note before headings.');
+    assert.match(blocks[2].text, /^## TL;DR\nMain summary\.$/);
   });
 
   it('strips trailing colons from headings', () => {
     const text = '**TL;DR:**\nbody';
     const blocks = chunkReplyBlocks(text);
-    assert.strictEqual(blocks[0].text.text, '*TL;DR*\nbody');
+    assert.strictEqual(blocks[0].text, '## TL;DR\nbody');
   });
 
   it('handles a heading with no body (e.g. empty section)', () => {
@@ -96,8 +96,8 @@ describe('chunkReplyBlocks', () => {
     const blocks = chunkReplyBlocks(text);
     assert.deepStrictEqual(
       blocks.map((b) => b.type),
-      ['section', 'divider', 'section'],
+      ['markdown', 'divider', 'markdown'],
     );
-    assert.strictEqual(blocks[0].text.text, '*TL;DR*');
+    assert.strictEqual(blocks[0].text, '## TL;DR');
   });
 });

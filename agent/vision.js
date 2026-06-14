@@ -3,7 +3,9 @@ import { GoogleGenAI } from '@google/genai';
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
 const ALT_TEXT_PROMPT = `Describe this image as alt text for a screen reader user. \
-One concise sentence (max 25 words). Plain language. No emoji. Do not start with "Image of" or "Picture of". \
+One concise sentence (max 25 words). Plain language. No emoji. No markdown formatting \
+(no **bold**, no *italic*, no backticks, no headings, no lists). \
+Do not start with "Image of" or "Picture of". \
 If the image contains readable text (a screenshot, diagram, chart), include the key text and what it conveys.`;
 
 /**

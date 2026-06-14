@@ -1,6 +1,7 @@
 import { runAgent } from '../../agent/index.js';
 import { getMode, MODES } from '../../lib/modes.js';
 import { getPrefs, setPrefs } from '../../lib/prefs.js';
+import { chunkReplyBlocks } from '../../lib/reply-blocks.js';
 
 const HELP = [
   '*AccessibilityAlly commands*',
@@ -78,7 +79,15 @@ export async function handleAllyCommand({ ack, command, respond, client, context
         arg,
       ].join('\n');
       const { responseText } = await runAgent(prompt, deps);
-      await respond({ response_type: 'ephemeral', text: responseText || '(no response)' });
+      // Render via `markdown` blocks so Gemini's CommonMark (**bold**, lists,
+      // headings) survives — Slack's mrkdwn dialect on the bare `text:` field
+      // would render `**bold**` literally. `text:` stays as a notification
+      // fallback for clients that don't render blocks.
+      await respond({
+        response_type: 'ephemeral',
+        text: responseText || '(no response)',
+        blocks: chunkReplyBlocks(responseText),
+      });
       return;
     }
 

@@ -5,12 +5,15 @@ import { getMode, MODES } from '../../lib/modes.js';
  *
  * Layout (top to bottom):
  *   - Title header + one-line value prop
+ *   - Real-Time Search status row (kept near the top so it survives the
+ *     scroll reset triggered by re-publishing the view after a mode pill
+ *     click — at the bottom it falls below the fold and looks missing)
  *   - "How to use me" section
  *   - "Your mode" sub-header
  *   - Four mode cards: one section block per mode, each with its own
  *     "Use this mode" / "✓ Active" button. The active mode is shown
  *     as a confirm-style primary button so the choice is unmistakable.
- *   - Two context blocks: search status + privacy note
+ *   - Privacy footer
  *
  * @param {Object} [opts]
  * @param {string | null} [opts.currentModeId]
@@ -55,6 +58,18 @@ export function buildAppHomeView({ currentModeId = null, isSearchEnabled = false
       },
     },
     {
+      type: 'context',
+      block_id: 'rts_status',
+      elements: [
+        {
+          type: 'mrkdwn',
+          text: isSearchEnabled
+            ? ':white_check_mark: *Slack Real-Time Search is connected.* I can search workspace history for backstory and acronym definitions.'
+            : ':warning: *Slack Real-Time Search is not connected.* Set `SLACK_USER_TOKEN` (dev mode) or run OAuth flow to enable cross-channel search.',
+        },
+      ],
+    },
+    {
       type: 'section',
       text: {
         type: 'mrkdwn',
@@ -82,17 +97,6 @@ export function buildAppHomeView({ currentModeId = null, isSearchEnabled = false
     },
     ...modeCards,
     { type: 'divider' },
-    {
-      type: 'context',
-      elements: [
-        {
-          type: 'mrkdwn',
-          text: isSearchEnabled
-            ? ':white_check_mark: *Slack Real-Time Search is connected.* I can search workspace history for backstory and acronym definitions.'
-            : ':warning: *Slack Real-Time Search is not connected.* Set `SLACK_USER_TOKEN` (dev mode) or run OAuth flow to enable cross-channel search.',
-        },
-      ],
-    },
     {
       type: 'context',
       elements: [
