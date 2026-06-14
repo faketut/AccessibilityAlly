@@ -1,3 +1,26 @@
+// Cap how much we hand back to the model from a single Slack search hit; keeps
+// the function-response tokens predictable and avoids dumping novels into the prompt.
+const MAX_RESULT_TEXT_CHARS = 400;
+
+// Retry once on 429 / 5xx. Backoff is capped so a slow Jira can't stall the agent.
+const RETRY_STATUS = new Set([429, 500, 502, 503, 504]);
+const MAX_RETRY_DELAY_MS = 2000;
+
+/**
+ * @param {string} url
+ * @param {RequestInit} init
+ * @returns {Promise<Response>}
+ */
+async function fetchWithRetry(url, init) {
+  const first = await fetch(url, init);
+  if (!RETRY_STATUS.has(first.status)) return first;
+
+  const retryAfter = Number(first.headers.get('retry-after'));
+  const delayMs = Number.isFinite(retryAfter) && retryAfter > 0 ? Math.min(retryAfter * 1000, MAX_RETRY_DELAY_MS) : 500;
+  await new Promise((r) => setTimeout(r, delayMs));
+  return fetch(url, init);
+}
+
 /**
  * Search Slack messages with the configured user token so results respect that user's access.
  * @param {{ query?: string, count?: number }} args
@@ -13,7 +36,7 @@ export async function searchSlack(args) {
   const count = Number.isFinite(args?.count) ? Math.max(1, Math.min(10, Number(args.count))) : 5;
   const body = new URLSearchParams({ query, count: String(count), sort: 'timestamp' });
 
-  const res = await fetch('https://slack.com/api/search.messages', {
+  const res = await fetchWithRetry('https://slack.com/api/search.messages', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -38,7 +61,7 @@ export async function searchSlack(args) {
       channel: m?.channel?.name || '',
       user: m?.username || m?.user || '',
       ts: m?.ts || '',
-      text: typeof m?.text === 'string' ? m.text.slice(0, 400) : '',
+      text: typeof m?.text === 'string' ? m.text.slice(0, MAX_RESULT_TEXT_CHARS) : '',
       permalink: m?.permalink || '',
     })),
   };
@@ -62,7 +85,7 @@ export async function fetchJiraIssue(args) {
 
   const auth = Buffer.from(`${email}:${token}`).toString('base64');
   const url = `${base.replace(/\/$/, '')}/rest/api/3/issue/${encodeURIComponent(key)}?fields=summary,status,assignee`;
-  const res = await fetch(url, {
+  const res = await fetchWithRetry(url, {
     headers: {
       Authorization: `Basic ${auth}`,
       Accept: 'application/json',

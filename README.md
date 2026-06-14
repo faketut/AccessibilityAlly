@@ -143,6 +143,13 @@ npm install
 npm start
 ```
 
+User mode preferences are persisted to `.ally-data/user-prefs.json` (created on
+first write, already in `.gitignore`). Delete the file to reset every user.
+
+The app icon lives at [app-icon.svg](app-icon.svg). Slack only accepts raster
+uploads, so export the SVG to a 512x512 PNG and upload it via
+**Basic Information > Display Information** in the [Slack API dashboard](https://api.slack.com/apps).
+
 ## Deploy to Railway (recommended)
 
 Railway runs `npm install && npm start` on a container that doesn't sleep —

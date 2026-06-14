@@ -1,4 +1,4 @@
-import { runAgent } from '../../agent/index.js';
+import { runAgent } from '../../agent/agent.js';
 import { getPrefs } from '../../lib/prefs.js';
 import { chunkReplyBlocks } from '../../lib/reply-blocks.js';
 import { buildFeedbackBlocks } from '../views/feedback-builder.js';

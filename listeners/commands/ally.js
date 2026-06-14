@@ -1,4 +1,4 @@
-import { runAgent } from '../../agent/index.js';
+import { runAgent } from '../../agent/agent.js';
 import { getMode, MODES } from '../../lib/modes.js';
 import { getPrefs, setPrefs } from '../../lib/prefs.js';
 import { chunkReplyBlocks } from '../../lib/reply-blocks.js';

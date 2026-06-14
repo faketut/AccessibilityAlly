@@ -70,6 +70,29 @@ For free-form chat outside of "catch me up", just follow the principles and the 
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
+// Each Gemini round-trip is capped so a hung call can't sit forever on the
+// user's spinner. Total budget keeps multi-tool loops from snowballing.
+const PER_CALL_TIMEOUT_MS = 30_000;
+const TOTAL_BUDGET_MS = 60_000;
+const MAX_ITERATIONS = 4;
+
+/** @param {Promise<T>} p @param {number} ms @returns {Promise<T>} @template T */
+function withTimeout(p, ms) {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error(`Gemini call timed out after ${ms}ms`)), ms);
+    p.then(
+      (v) => {
+        clearTimeout(t);
+        resolve(v);
+      },
+      (e) => {
+        clearTimeout(t);
+        reject(e);
+      },
+    );
+  });
+}
+
 const TOOL_DECLARATIONS = [
   {
     name: 'search_slack',
@@ -128,19 +151,24 @@ async function dispatchToolCall(call) {
  */
 export async function runAgent(text, deps = undefined) {
   const systemInstruction = SYSTEM_PROMPT + modePromptFragment(deps?.modeId);
+  const startedAt = Date.now();
 
   /** @type {Array<{ role: 'user' | 'model', parts: Array<Record<string, unknown>> }>} */
   const contents = [{ role: 'user', parts: [{ text }] }];
 
-  for (let i = 0; i < 4; i += 1) {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-lite',
-      contents,
-      config: {
-        systemInstruction,
-        tools: [{ functionDeclarations: TOOL_DECLARATIONS }],
-      },
-    });
+  for (let i = 0; i < MAX_ITERATIONS; i += 1) {
+    if (Date.now() - startedAt > TOTAL_BUDGET_MS) break;
+    const response = await withTimeout(
+      ai.models.generateContent({
+        model: 'gemini-2.5-flash-lite',
+        contents,
+        config: {
+          systemInstruction,
+          tools: [{ functionDeclarations: TOOL_DECLARATIONS }],
+        },
+      }),
+      PER_CALL_TIMEOUT_MS,
+    );
 
     const calls = (response.functionCalls || []).filter((call) => !!call.name);
     if (calls.length === 0) {
@@ -163,7 +191,9 @@ export async function runAgent(text, deps = undefined) {
     contents.push({ role: 'user', parts: toolResponses });
   }
 
-  (deps?.logger ?? console).warn('runAgent: hit 4-iteration tool-loop cap without a final response.');
+  (deps?.logger ?? console).warn(
+    `runAgent: stopped without final response (iterations cap or ${TOTAL_BUDGET_MS}ms budget exhausted).`,
+  );
   return {
     responseText: 'I could not finish gathering context from tools in time. Please try again.',
   };

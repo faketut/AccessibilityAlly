@@ -1,7 +1,11 @@
+import { runAgent } from '../../agent/agent.js';
 import { classifyThread, formatStateBadge } from '../../agent/classifier.js';
-import { runAgent } from '../../agent/index.js';
 import { getMode } from '../../lib/modes.js';
 import { chunkReplyBlocks } from '../../lib/reply-blocks.js';
+
+// Cap how many replies we pull from Slack. Bigger threads still summarize, but
+// we tell the user the tail was truncated so they don't trust the summary blindly.
+const MAX_THREAD_REPLIES = 200;
 
 /**
  * Handle submission of the Catch-me-up mode picker modal.
@@ -26,10 +30,22 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, logger })
     const replies = await client.conversations.replies({
       channel: meta.channelId,
       ts: meta.threadTs,
-      limit: 200,
+      limit: MAX_THREAD_REPLIES,
     });
 
-    const messages = (replies.messages || [])
+    const rawMessages = replies.messages || [];
+    if (rawMessages.length === 0) {
+      await client.chat.postEphemeral({
+        channel: meta.channelId,
+        user: userId,
+        thread_ts: meta.threadTs,
+        text: ':information_source: This thread is empty \u2014 nothing to summarize.',
+      });
+      return;
+    }
+    const truncated = Boolean(replies.has_more);
+
+    const messages = rawMessages
       .map((m) => {
         const who = m.user ? `<@${m.user}>` : m.bot_id ? '(bot)' : '(unknown)';
         return `${who}: ${m.text || ''}`;
@@ -49,6 +65,7 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, logger })
       `Source channel: <#${meta.channelId}>${permalink ? ` (${permalink})` : ''}`,
       `Active mode: ${mode.label}`,
       focus ? `Reader's specific question: ${focus}` : '',
+      truncated ? `Note: the thread exceeded ${MAX_THREAD_REPLIES} replies; older messages were truncated.` : '',
       '',
       'Thread messages (oldest first):',
       messages,
@@ -97,7 +114,12 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, logger })
     }
     blocks.push({
       type: 'context',
-      elements: [{ type: 'mrkdwn', text: `:lock: Only visible to you · Mode: *${mode.label}*` }],
+      elements: [
+        {
+          type: 'mrkdwn',
+          text: `:lock: Only visible to you \u00b7 Mode: *${mode.label}*${truncated ? ' \u00b7 _thread truncated_' : ''}`,
+        },
+      ],
     });
 
     await client.chat.postEphemeral({
