@@ -40,9 +40,10 @@ export async function respondAsAlly({ client, context, event, sayStream, setStat
     modeId: getPrefs(userId).mode,
   };
   const { responseText } = await runAgent(text, deps);
+  // runAgent returns the full reply in one shot — no incremental tokens — so we
+  // skip `append` and finalize the stream in a single `stop` call. Calling both
+  // append + stop caused a duplicate render because stopStream sends the final
+  // `blocks` *in addition to* any already-buffered/flushed markdown_text chunks.
   const streamer = sayStream();
-  await streamer.append({ markdown_text: responseText });
-  // Finalize with structured blocks: chunked sections (better visual hierarchy
-  // and screen-reader semantics than one giant mrkdwn block) + feedback buttons.
   await streamer.stop({ blocks: [...chunkReplyBlocks(responseText), ...buildFeedbackBlocks()] });
 }
