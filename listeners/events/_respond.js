@@ -19,7 +19,7 @@ const STATUS = {
  *
  * @param {{
  *   client: import('@slack/web-api').WebClient,
- *   context: { userId?: string, userToken?: string },
+ *   context: { userId?: string },
  *   event: { channel: string, ts: string, thread_ts?: string },
  *   sayStream: any,
  *   setStatus: any,
@@ -36,7 +36,6 @@ export async function respondAsAlly({ client, context, event, sayStream, setStat
     channelId: event.channel,
     threadTs,
     messageTs: event.ts,
-    userToken: context.userToken,
     modeId: getPrefs(userId).mode,
   };
   const { responseText } = await runAgent(text, deps);

@@ -9,7 +9,7 @@ const MAX_BYTES = 8 * 1024 * 1024; // 8MB — keep Gemini calls cheap and fast.
  *
  * @param {import('@slack/bolt').AllMiddlewareArgs & import('@slack/bolt').SlackEventMiddlewareArgs<'file_shared'>} args
  */
-export async function handleFileShared({ client, context, event, logger }) {
+export async function handleFileShared({ client, event, logger }) {
   try {
     const info = await client.files.info({ file: event.file_id });
     const file = info.file;
@@ -24,8 +24,9 @@ export async function handleFileShared({ client, context, event, logger }) {
     const channelId = /** @type {any} */ (event).channel_id || file.channels?.[0] || file.groups?.[0] || file.ims?.[0];
     if (!downloadUrl || !channelId) return;
 
-    const botToken = context.botToken || process.env.SLACK_BOT_TOKEN;
-    const res = await fetch(downloadUrl, { headers: { Authorization: `Bearer ${botToken}` } });
+    const res = await fetch(downloadUrl, {
+      headers: { Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}` },
+    });
     if (!res.ok) {
       logger.warn(`alt-text: download failed (${res.status})`);
       return;

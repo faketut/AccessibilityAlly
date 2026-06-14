@@ -11,7 +11,7 @@ import { chunkReplyBlocks } from '../../lib/reply-blocks.js';
  *
  * @param {import('@slack/bolt').AllMiddlewareArgs & import('@slack/bolt').SlackViewMiddlewareArgs<import('@slack/bolt').ViewSubmitAction>} args
  */
-export async function handleCatchMeUpSubmit({ ack, view, client, body, context, logger }) {
+export async function handleCatchMeUpSubmit({ ack, view, client, body, logger }) {
   await ack();
 
   /** @type {{ channelId: string, threadTs: string, messageTs: string }} */
@@ -72,7 +72,6 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, context, 
       channelId: meta.channelId,
       threadTs: meta.threadTs,
       messageTs: meta.messageTs,
-      userToken: context.userToken,
       modeId: mode.id,
     };
 

@@ -17,7 +17,7 @@ const HELP = [
  * Handle the /ally slash command.
  * @param {import('@slack/bolt').SlackCommandMiddlewareArgs & import('@slack/bolt').AllMiddlewareArgs} args
  */
-export async function handleAllyCommand({ ack, command, respond, client, context, logger }) {
+export async function handleAllyCommand({ ack, command, respond, client, logger }) {
   await ack();
   const userId = command.user_id;
   const raw = (command.text || '').trim();
@@ -67,7 +67,6 @@ export async function handleAllyCommand({ ack, command, respond, client, context
         channelId: command.channel_id,
         threadTs: '',
         messageTs: '',
-        userToken: context.userToken,
         modeId,
       };
       const prompt = [
@@ -94,6 +93,9 @@ export async function handleAllyCommand({ ack, command, respond, client, context
     await respond({ response_type: 'ephemeral', text: `Unknown subcommand \`${sub}\`.\n\n${HELP}` });
   } catch (e) {
     logger.error(`/ally command failed: ${e}`);
-    await respond({ response_type: 'ephemeral', text: `:warning: Ally hit an error: ${e}` });
+    await respond({
+      response_type: 'ephemeral',
+      text: ':warning: Ally hit an error. Please try again in a moment.',
+    });
   }
 }

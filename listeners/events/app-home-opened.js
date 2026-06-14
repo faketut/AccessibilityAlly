@@ -9,7 +9,7 @@ export async function handleAppHomeOpened({ client, context, logger }) {
   try {
     const userId = /** @type {string} */ (context.userId);
     const prefs = getPrefs(userId);
-    const isSearchEnabled = !!context.userToken || !!process.env.SLACK_USER_TOKEN;
+    const isSearchEnabled = !!process.env.SLACK_USER_TOKEN;
     const view = buildAppHomeView({ currentModeId: prefs.mode ?? null, isSearchEnabled });
     await client.views.publish({ user_id: userId, view });
   } catch (e) {

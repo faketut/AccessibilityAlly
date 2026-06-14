@@ -1,19 +1,13 @@
 /**
- * @typedef {Object} AgentDeps
- * @property {string} [userToken]
- */
-
-/**
- * Search Slack messages with a user token so results respect the invoking user's access.
+ * Search Slack messages with the configured user token so results respect that user's access.
  * @param {{ query?: string, count?: number }} args
- * @param {AgentDeps | undefined} deps
  * @returns {Promise<{ results?: Array<{ channel: string, user: string, ts: string, text: string, permalink: string }>, error?: string }>}
  */
-export async function searchSlack(args, deps) {
+export async function searchSlack(args) {
   const query = args?.query?.trim();
   if (!query) return { error: 'missing query' };
 
-  const token = deps?.userToken || process.env.SLACK_USER_TOKEN;
+  const token = process.env.SLACK_USER_TOKEN;
   if (!token) return { error: 'Slack user token not configured' };
 
   const count = Number.isFinite(args?.count) ? Math.max(1, Math.min(10, Number(args.count))) : 5;

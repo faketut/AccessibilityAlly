@@ -64,7 +64,6 @@ For free-form chat outside of "catch me up", just follow the principles and the 
  * @property {string} channelId
  * @property {string} threadTs
  * @property {string} messageTs
- * @property {string} [userToken]
  * @property {string} [modeId]
  */
 
@@ -108,12 +107,11 @@ const TOOL_DECLARATIONS = [
 
 /**
  * @param {{name: string, args?: Record<string, unknown>}} call
- * @param {AgentDeps | undefined} deps
  * @returns {Promise<Record<string, unknown>>}
  */
-async function dispatchToolCall(call, deps) {
+async function dispatchToolCall(call) {
   if (call.name === 'search_slack') {
-    return searchSlack(/** @type {{query?: string, count?: number}} */ (call.args || {}), deps);
+    return searchSlack(/** @type {{query?: string, count?: number}} */ (call.args || {}));
   }
   if (call.name === 'fetch_jira_issue') {
     return fetchJiraIssue(/** @type {{key?: string}} */ (call.args || {}));
@@ -154,13 +152,10 @@ export async function runAgent(text, deps = undefined) {
       calls.map(async (call) => ({
         functionResponse: {
           name: /** @type {string} */ (call.name),
-          response: await dispatchToolCall(
-            {
-              name: /** @type {string} */ (call.name),
-              args: /** @type {Record<string, unknown> | undefined} */ (call.args),
-            },
-            deps,
-          ),
+          response: await dispatchToolCall({
+            name: /** @type {string} */ (call.name),
+            args: /** @type {Record<string, unknown> | undefined} */ (call.args),
+          }),
         },
       })),
     );
