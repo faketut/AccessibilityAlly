@@ -21,12 +21,13 @@ const STATUS = {
  *   client: import('@slack/web-api').WebClient,
  *   context: { userId?: string },
  *   event: { channel: string, ts: string, thread_ts?: string },
+ *   logger: import('@slack/bolt').Logger,
  *   sayStream: any,
  *   setStatus: any,
  *   text: string,
  * }} args
  */
-export async function respondAsAlly({ client, context, event, sayStream, setStatus, text }) {
+export async function respondAsAlly({ client, context, event, logger, sayStream, setStatus, text }) {
   await setStatus(STATUS);
   const userId = /** @type {string} */ (context.userId);
   const threadTs = event.thread_ts || event.ts;
@@ -37,6 +38,7 @@ export async function respondAsAlly({ client, context, event, sayStream, setStat
     threadTs,
     messageTs: event.ts,
     modeId: getPrefs(userId).mode,
+    logger,
   };
   const { responseText } = await runAgent(text, deps);
   // runAgent returns the full reply in one shot — no incremental tokens — so we

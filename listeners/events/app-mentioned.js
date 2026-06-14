@@ -17,7 +17,7 @@ export async function handleAppMentioned({ client, context, event, logger, say, 
       return;
     }
 
-    await respondAsAlly({ client, context, event, sayStream, setStatus, text });
+    await respondAsAlly({ client, context, event, logger, sayStream, setStatus, text });
   } catch (e) {
     logger.error(`Failed to handle app mention: ${e}`);
     await say({

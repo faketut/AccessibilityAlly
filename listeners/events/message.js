@@ -22,7 +22,7 @@ export async function handleMessage({ client, context, event, logger, say, saySt
   if (event.channel_type !== 'im') return;
 
   try {
-    await respondAsAlly({ client, context, event, sayStream, setStatus, text: event.text || '' });
+    await respondAsAlly({ client, context, event, logger, sayStream, setStatus, text: event.text || '' });
   } catch (e) {
     logger.error(`Failed to handle message: ${e}`);
     await say({

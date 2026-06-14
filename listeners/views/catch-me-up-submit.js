@@ -73,6 +73,7 @@ export async function handleCatchMeUpSubmit({ ack, view, client, body, logger })
       threadTs: meta.threadTs,
       messageTs: meta.messageTs,
       modeId: mode.id,
+      logger,
     };
 
     const { responseText } = await runAgent(prompt, deps);

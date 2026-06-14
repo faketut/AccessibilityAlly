@@ -68,6 +68,7 @@ export async function handleAllyCommand({ ack, command, respond, client, logger 
         threadTs: '',
         messageTs: '',
         modeId,
+        logger,
       };
       const prompt = [
         'Task: rewrite the snippet below according to the ACTIVE MODE.',
