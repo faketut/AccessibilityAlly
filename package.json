@@ -9,7 +9,10 @@
     "lint": "npx @biomejs/biome check .",
     "lint:fix": "npx @biomejs/biome check --write .",
     "test": "node --test",
-    "seed:jira": "node scripts/seed-jira.js"
+    "seed:jira": "node scripts/seed-jira.js",
+    "deploy": "slack deploy",
+    "env:list": "slack env list",
+    "env:init": "slack env init"
   },
   "dependencies": {
     "@google/genai": "^2.8.0",

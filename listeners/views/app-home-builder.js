@@ -75,10 +75,12 @@ export function buildAppHomeView({ currentModeId = null, isSearchEnabled = false
         type: 'mrkdwn',
         text:
           '*How to use me:*\n' +
-          "• Right-click any thread → *More actions* → *Catch me up* — I'll summarize for your mode\n" +
-          '• `/ally plainify <text>` — rewrite a snippet in plain language\n' +
-          '• `/ally mode <translate|brief|onboard|simplify>` — change your default mode\n' +
-          '• DM me or `@ally` in a channel for free-form questions',
+          "• *Catch me up* — hover any message → *More message shortcuts* → *Catch me up*. I'll summarize the thread in your mode, just for you.\n" +
+          '• `/ally plainify <text>` — rewrite a snippet in plain language for your mode\n' +
+          "• *Upload an image* in a channel I'm in — I'll post auto-generated alt text\n" +
+          '• DM me, `@ally` in a channel, or open me from the Slack AI assistant sidebar for free-form questions\n' +
+          '• `/ally help` — list every slash subcommand\n' +
+          '\n_Tip: pick a mode card below to change your default. `/ally mode <translate|brief|onboard|simplify>` works too._',
       },
     },
     { type: 'divider' },

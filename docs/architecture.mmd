@@ -1,0 +1,56 @@
+flowchart TB
+  subgraph slack["Slack workspace"]
+    U[User]
+    Shortcut["Message shortcut<br/>'Catch me up'"]
+    Slash["Slash command<br/>/ally"]
+    Mention["@mention / DM"]
+    File["Image upload<br/>(file_shared)"]
+    Home["App Home tab"]
+  end
+
+  subgraph ally["AccessibilityAlly (Bolt for JS, Socket Mode)"]
+    Router["Listener router<br/>app.js + /listeners/index.js"]
+    CatchUp["catch-me-up<br/>shortcut + modal + submit"]
+    Cmd["/ally subcommands<br/>mode · plainify · help"]
+    Chat["@mention / DM handler"]
+    AltText["alt-text generator<br/>(file_shared)"]
+    Classifier["thread state classifier"]
+    Prefs[("user prefs JSON<br/>mode per user")]
+    Sessions[("thread session store<br/>in-memory, TTL")]
+  end
+
+  subgraph ai["Gemini 2.5 Flash Lite"]
+    Text["Text generation<br/>+ mode system prompt"]
+    Vision["Multimodal image<br/>understanding"]
+    Tools["Function calling<br/>search_slack · fetch_jira_issue"]
+  end
+
+  subgraph external["External data"]
+    SlackAPI["Slack Web API<br/>search.messages, conversations.replies, files.info"]
+    Jira["Jira REST API"]
+  end
+
+  U --> Shortcut & Slash & Mention & File & Home
+  Shortcut --> CatchUp
+  Slash --> Cmd
+  Mention --> Chat
+  File --> AltText
+  Home --> Prefs
+
+  CatchUp --> Classifier --> Text
+  CatchUp --> Text
+  Cmd --> Text
+  Chat --> Text
+  AltText --> Vision
+  Text -.tool calls.-> Tools
+  Tools --> SlackAPI
+  Tools --> Jira
+
+  CatchUp --> Sessions
+  Chat --> Sessions
+  Cmd --> Prefs
+  Chat --> Prefs
+
+  Text --> Router
+  Vision --> Router
+  Router -->|ephemeral or threaded reply| U

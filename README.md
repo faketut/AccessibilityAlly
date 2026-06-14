@@ -142,3 +142,27 @@ cp .env.sample .env   # fill in GOOGLE_API_KEY, SLACK_BOT_TOKEN, SLACK_APP_TOKEN
 npm install
 npm start
 ```
+
+## Deploy with the Slack CLI
+
+`slack deploy` ships Ally to Slack-hosted infrastructure so the bot stays up
+when your laptop sleeps. The CLI reads secrets straight from `.env` — no
+manual `slack env set` per key needed.
+
+```sh
+slack login                     # once per workspace
+npm install
+npm run deploy                  # alias for `slack deploy`
+npm run env:list                # confirm secrets uploaded
+```
+
+Anything uncommented in `.env` is uploaded as a project env var on deploy:
+
+| key                    | required for                       |
+| ---------------------- | ---------------------------------- |
+| `GOOGLE_API_KEY`       | every Gemini call (text + vision)  |
+| `SLACK_USER_TOKEN`     | Slack Real-Time Search tool calls  |
+| `JIRA_BASE_URL`/`_EMAIL`/`_API_TOKEN` | `fetch_jira_issue` tool |
+
+`SLACK_BOT_TOKEN` and `SLACK_APP_TOKEN` are managed by the Slack CLI itself —
+leave them commented out in `.env` when deploying.
