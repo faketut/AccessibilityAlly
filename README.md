@@ -143,26 +143,43 @@ npm install
 npm start
 ```
 
-## Deploy with the Slack CLI
+## Deploy to Railway (recommended)
 
-`slack deploy` ships Ally to Slack-hosted infrastructure so the bot stays up
-when your laptop sleeps. The CLI reads secrets straight from `.env` — no
-manual `slack env set` per key needed.
+Railway runs `npm install && npm start` on a container that doesn't sleep —
+exactly what a Socket Mode Bolt app needs. The app dials out to Slack over
+WebSocket, so no inbound port, no health check, no public URL required.
 
 ```sh
-slack login                     # once per workspace
-npm install
-npm run deploy                  # alias for `slack deploy`
-npm run env:list                # confirm secrets uploaded
+# Push the repo to GitHub (Railway pulls from there).
+git push
+
+# In Railway dashboard (https://railway.app):
+#   1. New Project → Deploy from GitHub Repo → AccessibilityAlly
+#   2. Service → Variables → Raw Editor → paste your .env contents
+#      (omit SLACK_CLIENT_*, SLACK_REDIRECT_URI; keep BOT/APP tokens)
+#   3. Service → Settings → Networking → leave "Public Networking" OFF
+#   4. Deployments → wait for the first build to go green
 ```
 
-Anything uncommented in `.env` is uploaded as a project env var on deploy:
+Verify in the Railway logs that you see `AccessibilityAlly is running.`, then
+DM `@ally` in the sandbox workspace to confirm the bot replies.
 
-| key                    | required for                       |
-| ---------------------- | ---------------------------------- |
-| `GOOGLE_API_KEY`       | every Gemini call (text + vision)  |
-| `SLACK_USER_TOKEN`     | Slack Real-Time Search tool calls  |
-| `JIRA_BASE_URL`/`_EMAIL`/`_API_TOKEN` | `fetch_jira_issue` tool |
+To take it offline (e.g. after judging):
 
-`SLACK_BOT_TOKEN` and `SLACK_APP_TOKEN` are managed by the Slack CLI itself —
-leave them commented out in `.env` when deploying.
+```sh
+# Stop the service from the dashboard, OR scale to zero:
+railway down
+```
+
+Then rotate `GOOGLE_API_KEY`, `SLACK_USER_TOKEN`, `JIRA_API_TOKEN`, and
+reinstall the Slack app to invalidate `SLACK_BOT_TOKEN` / `SLACK_APP_TOKEN`.
+
+### Required Railway variables
+
+| key                                   | required for                       |
+| ------------------------------------- | ---------------------------------- |
+| `GOOGLE_API_KEY`                      | every Gemini call (text + vision)  |
+| `SLACK_BOT_TOKEN` (`xoxb-…`)          | Slack API calls                    |
+| `SLACK_APP_TOKEN` (`xapp-…`)          | Socket Mode WebSocket              |
+| `SLACK_USER_TOKEN` (`xoxp-…`)         | Slack Real-Time Search tool calls  |
+| `JIRA_BASE_URL`, `JIRA_EMAIL`, `JIRA_API_TOKEN` | `fetch_jira_issue` tool  |

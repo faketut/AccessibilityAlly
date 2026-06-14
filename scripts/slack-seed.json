@@ -1,0 +1,8 @@
+{
+  "messages": [
+    "Heads up: the auth rollout is blocked on the canary error spike. KAN-5 is still open, KAN-6 has the RCA, and we should hold the migration until the rollback patch lands.",
+    "Are we sure the KAN-6 RCA covers the edge cases we saw in EU? Sarah mentioned the JWT token expiry might be a secondary trigger.",
+    "Good point. I'll get Bob to look at the JWT rotation in the canary. Until then, DECISION NEEDED: do we proceed with US-only or fully halt?",
+    "Let's fully halt until Bob's PR is merged. We can't risk the auth tokens dropping."
+  ]
+}
