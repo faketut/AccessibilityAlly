@@ -1,0 +1,11 @@
+{
+  "apps": {
+    "E0BADC79WDT": {
+      "app_id": "A0BBB8NQ8G0",
+      "enterprise_id": "E0BADC79WDT",
+      "team_domain": "ally-demo-sandbox",
+      "team_id": "E0BADC79WDT"
+    }
+  },
+  "default": "ally-demo-sandbox"
+}
