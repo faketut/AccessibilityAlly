@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "type": "module",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "check": "npx tsc --checkJs --noEmit --skipLibCheck --esModuleInterop --target esnext --module nodenext --moduleResolution nodenext app.js",
     "start": "node app.js",
